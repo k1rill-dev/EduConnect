@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Label, TextInput, FileInput, Accordion } from "flowbite-react";
+import { Button, Label, TextInput, Textarea, FileInput, Accordion } from "flowbite-react";
 
 const CreateCoursePage = () => {
   const [courseData, setCourseData] = useState({
@@ -13,7 +13,11 @@ const CreateCoursePage = () => {
   const [assignments, setAssignments] = useState({});
   const [newAssignments, setNewAssignments] = useState({});
   const [editingAssignmentIndex, setEditingAssignmentIndex] = useState(null);
-  const [editingAssignmentData, setEditingAssignmentData] = useState({ title: "", theoryFile: null });
+  const [editingAssignmentData, setEditingAssignmentData] = useState({
+    title: "",
+    theoryFile: null,
+    additionalInfo: "", // Для дополнительной информации
+  });
 
   const handleCourseChange = (e) => {
     const { name, value } = e.target;
@@ -33,7 +37,7 @@ const CreateCoursePage = () => {
 
       setNewAssignments((prev) => ({
         ...prev,
-        [topicIndex]: { title: "", theoryFile: null },
+        [topicIndex]: { title: "", theoryFile: null, additionalInfo: "" },
       }));
     }
   };
@@ -48,7 +52,7 @@ const CreateCoursePage = () => {
 
       setNewAssignments((prev) => ({
         ...prev,
-        [courseData.topics.length]: { title: "", theoryFile: null },
+        [courseData.topics.length]: { title: "", theoryFile: null, additionalInfo: "" },
       }));
     }
   };
@@ -67,7 +71,7 @@ const CreateCoursePage = () => {
       return updatedAssignments;
     });
     setEditingAssignmentIndex(null);
-    setEditingAssignmentData({ title: "", theoryFile: null });
+    setEditingAssignmentData({ title: "", theoryFile: null, additionalInfo: "" });
   };
 
   const handleSubmit = (e) => {
@@ -162,6 +166,18 @@ const CreateCoursePage = () => {
                                 }))
                               }
                             />
+                            <Label htmlFor="editAdditionalInfo" className="mb-2 block">Дополнительная информация</Label>
+                            <Textarea
+                              id="editAdditionalInfo"
+                              value={editingAssignmentData.additionalInfo}
+                              onChange={(e) =>
+                                setEditingAssignmentData((prev) => ({
+                                  ...prev,
+                                  additionalInfo: e.target.value,
+                                }))
+                              }
+                              placeholder="Введите дополнительную информацию"
+                            />
                             <Button
                               className="mt-2 bg-green-600 hover:bg-green-700"
                               onClick={handleSaveAssignmentEdit}
@@ -207,6 +223,24 @@ const CreateCoursePage = () => {
                           }))
                         }
                       />
+                      <Label htmlFor={`additionalInfo-${topicIndex}`} className="mb-2 block">Дополнительная информация</Label>
+                      <Textarea
+                        id={`additionalInfo-${topicIndex}`}
+                        placeholder="Введите дополнительную информацию"
+                        value={(newAssignments[topicIndex] || {}).additionalInfo || ""}
+                        onChange={(e) =>
+                          setNewAssignments((prev) => ({
+                            ...prev,
+                            [topicIndex]: {
+                              ...prev[topicIndex],
+                              additionalInfo: e.target.value,
+                            },
+                          }))
+                        }
+                      />
+                      <Label htmlFor={`assignmentTitle-${topicIndex}`} className="block">
+                        Теория
+                      </Label>
                       <FileInput
                         id={`theoryFile-${topicIndex}`}
                         onChange={(e) =>
