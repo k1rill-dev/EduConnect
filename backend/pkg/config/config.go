@@ -25,6 +25,7 @@ type Config struct {
 type MongoCollections struct {
 	Users         string `mapstructure:"users" validate:"required"`
 	RefreshTokens string `mapstructure:"refreshTokens" validate:"required"`
+	S3            string `mapstructure:"s3" validate:"required"`
 }
 
 type Http struct {
