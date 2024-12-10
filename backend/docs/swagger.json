@@ -50,6 +50,98 @@
                 }
             }
         },
+        "/api/auth/sign-out": {
+            "post": {
+                "description": "Завершение сессии пользователя с аннулированием токенов",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Выход пользователя",
+                "parameters": [
+                    {
+                        "description": "Данные для выхода",
+                        "name": "signOutRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.SignOutRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Пустой ответ при успешном завершении",
+                        "schema": {
+                            "$ref": "#/definitions/response.SignOutResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка валидации или неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/update-user": {
+            "post": {
+                "description": "Обновление пользователя",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Обновления пользователя",
+                "parameters": [
+                    {
+                        "description": "Данные для обновления",
+                        "name": "signInRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.UpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tokens",
+                        "schema": {
+                            "$ref": "#/definitions/response.UpdateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка валидации или неверные учетные данные",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/sign-in": {
             "post": {
                 "description": "Авторизация пользователя по email и паролю",
@@ -83,52 +175,6 @@
                     },
                     "400": {
                         "description": "Ошибка валидации или неверные учетные данные",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Внутренняя ошибка сервера",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/auth/sign-out": {
-            "post": {
-                "description": "Завершение сессии пользователя с аннулированием токенов",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Выход пользователя",
-                "parameters": [
-                    {
-                        "description": "Данные для выхода",
-                        "name": "signOutRequest",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.SignOutRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Пустой ответ при успешном завершении",
-                        "schema": {
-                            "$ref": "#/definitions/response.SignOutResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Ошибка валидации или неверные данные",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -246,6 +292,25 @@
                 }
             }
         },
+        "requests.UpdateRequest": {
+            "type": "object",
+            "required": [
+                "bio",
+                "email",
+                "picture"
+            ],
+            "properties": {
+                "bio": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "picture": {
+                    "type": "string"
+                }
+            }
+        },
         "response.ErrorResponse": {
             "type": "object",
             "required": [
@@ -301,6 +366,25 @@
                     "type": "string"
                 },
                 "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.UpdateResponse": {
+            "type": "object",
+            "required": [
+                "bio",
+                "email",
+                "picture"
+            ],
+            "properties": {
+                "bio": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "picture": {
                     "type": "string"
                 }
             }

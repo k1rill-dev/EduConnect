@@ -34,7 +34,7 @@ func NewServer(log logger.Logger, cfg *config.Config) *server {
 		log:  log,
 		cfg:  cfg,
 		echo: echo.New(),
-		// middleware: *middlewares.NewMiddlewareManager(log, cfg),
+		//middleware: middlewares.NewMiddlewareManager(log, cfg),
 	}
 }
 

@@ -37,6 +37,19 @@ definitions:
     - picture
     - role
     type: object
+  requests.UpdateRequest:
+    properties:
+      bio:
+        type: string
+      email:
+        type: string
+      picture:
+        type: string
+    required:
+    - bio
+    - email
+    - picture
+    type: object
   response.ErrorResponse:
     properties:
       error:
@@ -76,6 +89,19 @@ definitions:
     - access_token
     - refresh_token
     type: object
+  response.UpdateResponse:
+    properties:
+      bio:
+        type: string
+      email:
+        type: string
+      picture:
+        type: string
+    required:
+    - bio
+    - email
+    - picture
+    type: object
 info:
   contact: {}
 paths:
@@ -110,6 +136,66 @@ paths:
       summary: Обновление Access и Refresh токенов
       tags:
       - auth
+  /api/auth/sign-out:
+    post:
+      consumes:
+      - application/json
+      description: Завершение сессии пользователя с аннулированием токенов
+      parameters:
+      - description: Данные для выхода
+        in: body
+        name: signOutRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.SignOutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Пустой ответ при успешном завершении
+          schema:
+            $ref: '#/definitions/response.SignOutResponse'
+        "400":
+          description: Ошибка валидации или неверные данные
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Выход пользователя
+      tags:
+      - auth
+  /api/auth/update-user:
+    post:
+      consumes:
+      - application/json
+      description: Обновление пользователя
+      parameters:
+      - description: Данные для обновления
+        in: body
+        name: signInRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tokens
+          schema:
+            $ref: '#/definitions/response.UpdateResponse'
+        "400":
+          description: Ошибка валидации или неверные учетные данные
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Обновления пользователя
+      tags:
+      - auth
   /auth/sign-in:
     post:
       consumes:
@@ -138,36 +224,6 @@ paths:
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       summary: Вход пользователя
-      tags:
-      - auth
-  /auth/sign-out:
-    post:
-      consumes:
-      - application/json
-      description: Завершение сессии пользователя с аннулированием токенов
-      parameters:
-      - description: Данные для выхода
-        in: body
-        name: signOutRequest
-        required: true
-        schema:
-          $ref: '#/definitions/requests.SignOutRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Пустой ответ при успешном завершении
-          schema:
-            $ref: '#/definitions/response.SignOutResponse'
-        "400":
-          description: Ошибка валидации или неверные данные
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-        "500":
-          description: Внутренняя ошибка сервера
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-      summary: Выход пользователя
       tags:
       - auth
   /auth/sign-up:

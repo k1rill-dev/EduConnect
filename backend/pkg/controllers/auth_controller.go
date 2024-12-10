@@ -8,6 +8,7 @@ import (
 	"EduConnect/pkg/jwt"
 	"EduConnect/pkg/logger"
 	"EduConnect/pkg/requests"
+	"EduConnect/pkg/response"
 	"context"
 	"fmt"
 	"net/http"
@@ -179,14 +180,13 @@ func (a *AuthController) RefreshTokens(ctx echo.Context) error {
 // @Success 200 {object} response.SignOutResponse "Пустой ответ при успешном завершении"
 // @Failure 400 {object} response.ErrorResponse "Ошибка валидации или неверные данные"
 // @Failure 500 {object} response.ErrorResponse "Внутренняя ошибка сервера"
-// @Router /auth/sign-out [post]
+// @Router /api/auth/sign-out [post]
 func (a *AuthController) SignOut(ctx echo.Context) error {
 	var req requests.SignOutRequest
 	if err := a.decodeRequest(ctx, &req); err != nil {
 		a.log.Debugf("Failed to validate SignOutRequest: %v", err)
 		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Validation error: %v", err)})
 	}
-
 	accountClaims := (ctx.Get("claims")).(jwt5.MapClaims)
 	token := ctx.Get("token").(string)
 
@@ -200,4 +200,53 @@ func (a *AuthController) SignOut(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, map[string]string{})
+}
+
+// UpdateUser godoc
+// @Summary Обновления пользователя
+// @Description Обновление пользователя
+// @Tags auth
+// @Accept  json
+// @Produce  json
+// @Param   signInRequest body requests.UpdateRequest true "Данные для обновления"
+// @Success 200 {object} response.UpdateResponse "Tokens"
+// @Failure 400 {object} response.ErrorResponse "Ошибка валидации или неверные учетные данные"
+// @Failure 500 {object} response.ErrorResponse "Внутренняя ошибка сервера"
+// @Router /api/auth/update-user [post]
+func (a *AuthController) UpdateUser(ctx echo.Context) error {
+	a.log.Infof("(AuthController.UpdateUser)")
+	var req requests.UpdateRequest
+	if err := a.decodeRequest(ctx, &req); err != nil {
+		a.log.Debugf("Failed to validate request SignIn: %v", err)
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Validation error: %v", err)})
+	}
+	accountClaims := (ctx.Get("claims")).(jwt5.MapClaims)
+
+	accountId := accountClaims["sub"].(string)
+	email, err := values.NewEmail(req.Email)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Email error: %v", err)})
+	}
+
+	dbUser, err := a.userRepository.GetById(context.Background(), accountId)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": fmt.Sprintf("Internal server error: %v", err)})
+	}
+	userModel := &repository.UpdateUserRequest{
+		Id:      dbUser.Id,
+		Email:   email,
+		Picture: req.Picture,
+		Bio:     req.Bio,
+	}
+
+	err = a.userRepository.Update(context.Background(), userModel)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": fmt.Sprintf("Internal server error: %v", err)})
+	}
+
+	return ctx.JSON(http.StatusOK, response.UpdateResponse{
+		Email:   req.Email,
+		Picture: req.Picture,
+		Bio:     req.Bio,
+	})
 }

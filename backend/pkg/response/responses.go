@@ -18,6 +18,12 @@ type SignInResponse struct {
 type SignOutResponse struct {
 }
 
+type UpdateResponse struct {
+	Email   string `json:"email" validate:"required,email"`
+	Picture string `json:"picture" validate:"required"`
+	Bio     string `json:"bio" validate:"required"`
+}
+
 type ErrorResponse struct {
 	Error string `json:"error" validate:"required"`
 }

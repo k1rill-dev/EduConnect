@@ -4,7 +4,20 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="242fffd4-1ffd-4914-bfd1-2cee8835a3eb" name="Changes" comment="added field to create course page" />
+    <list default="true" id="242fffd4-1ffd-4914-bfd1-2cee8835a3eb" name="Changes" comment="added field to create course page">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/docs/docs.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docs/docs.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/docs/swagger.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docs/swagger.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/docs/swagger.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docs/swagger.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/internal/repository/user_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/internal/repository/user_repository.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pkg/controllers/auth_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pkg/controllers/auth_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pkg/middlewares/manager.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pkg/middlewares/manager.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pkg/repo/user_mongo_repo.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pkg/repo/user_mongo_repo.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pkg/requests/requests.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pkg/requests/requests.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pkg/response/responses.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pkg/response/responses.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/server/htttp_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/server/htttp_server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/server/server.go" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -22,7 +35,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="frontend/auth" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -53,12 +66,13 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Go Build.go build EduConnect.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.go.formatter.settings.were.checked": "true",
     "RunOnceActivity.go.migrated.go.modules.settings": "true",
     "RunOnceActivity.go.modules.automatic.dependencies.download": "true",
     "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "dev/profiles",
     "go.import.settings.migrated": "true",
     "go.sdk.automatically.set": "true",
     "last_opened_file_path": "D:/goyda/EduConnect",
@@ -73,6 +87,22 @@
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\goyda\EduConnect\frontend\src\components" />
     </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="go build EduConnect" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="EduConnect" />
+      <working_directory value="$PROJECT_DIR$/backend" />
+      <kind value="PACKAGE" />
+      <package value="EduConnect" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/backend/main.go" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Go Build.go build EduConnect" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>

@@ -17,5 +17,11 @@ type RefreshTokensRequest struct {
 	RefreshToken string `json:"refresh_token" validate:"required"`
 }
 
+type UpdateRequest struct {
+	Email   string `json:"email" validate:"required,email"`
+	Picture string `json:"picture" validate:"required"`
+	Bio     string `json:"bio" validate:"required"`
+}
+
 type SignOutRequest struct {
 }
