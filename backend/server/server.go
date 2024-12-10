@@ -27,6 +27,7 @@ type server struct {
 	authController           *controllers.AuthController
 	jobController            *controllers.JobController
 	jobApplicationController *controllers.ApplicationController
+	portfolioController      *controllers.PortfolioController
 	mongoClient              *mongo.Client
 	middleware               *middlewares.MiddlewareManager
 }
@@ -61,12 +62,14 @@ func (s *server) Run() error {
 	jobRepo := repo.NewJobRepo(s.log, s.cfg, s.mongoClient)
 	jobApplicationRepo := repo.NewJobApplicationRepo(s.log, s.cfg, s.mongoClient)
 	jwtRepo := repo.NewJwtRepo(s.log, s.cfg, redisClient, mongo)
+	portfolioRepo := repo.NewPortfolioRepositoryMongo(s.log, s.cfg, s.mongoClient)
 	jwtManager := jwt.NewJwtManager(s.log, s.cfg, jwtRepo)
 	validate := s.setupValidator()
 	s.middleware = middlewares.NewMiddlewareManager(s.log, s.cfg, jwtManager)
 	s.authController = controllers.NewAuthController(s.log, s.cfg, userRepo, validate, jwtManager)
 	s.jobController = controllers.NewJobController(s.log, s.cfg, jobRepo, validate, jwtManager, userRepo)
 	s.jobApplicationController = controllers.NewApplicationController(s.log, s.cfg, jobApplicationRepo, validate, jwtManager, userRepo)
+	s.portfolioController = controllers.NewPortfolioController(s.log, s.cfg, portfolioRepo, validate, jwtManager, userRepo)
 
 	go func() {
 		if err := s.runHttpServer(); err != nil {

@@ -1,5 +1,7 @@
 package requests
 
+import "EduConnect/internal/model"
+
 type SignUpRequest struct {
 	Email     string `json:"email" validate:"required,email"`
 	FirstName string `bson:"first_name" validate:"required"`
@@ -43,6 +45,11 @@ type CreateJobApplication struct {
 	CompanyId string `bson:"company_id" validate:"required"`
 	StudentId string `bson:"student_id" validate:"required"`
 	Status    string `bson:"status"  validate:"required"`
+}
+
+type CreatePortfolioRequest struct {
+	StudentId string                 `bson:"student_id"`
+	Items     []model.PortfolioItems `bson:"items"`
 }
 
 type SignOutRequest struct {

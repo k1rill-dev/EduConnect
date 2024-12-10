@@ -4,11 +4,12 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="242fffd4-1ffd-4914-bfd1-2cee8835a3eb" name="Changes" comment="added jobs functionality hihihihihi">
+    <list default="true" id="242fffd4-1ffd-4914-bfd1-2cee8835a3eb" name="Changes" comment="added job application functionality">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/docs/docs.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docs/docs.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/docs/swagger.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docs/swagger.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/docs/swagger.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docs/swagger.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/internal/model/portfolio.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/internal/model/portfolio.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/pkg/requests/requests.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pkg/requests/requests.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/server/htttp_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/server/htttp_server.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/server/server.go" afterDir="false" />
@@ -122,7 +123,8 @@
     <MESSAGE value="added update user method" />
     <MESSAGE value="added first name and surname fields to model.&#10;Recreated auth controllers :))" />
     <MESSAGE value="added jobs functionality hihihihihi" />
-    <option name="LAST_COMMIT_MESSAGE" value="added jobs functionality hihihihihi" />
+    <MESSAGE value="added job application functionality" />
+    <option name="LAST_COMMIT_MESSAGE" value="added job application functionality" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

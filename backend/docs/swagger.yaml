@@ -14,6 +14,26 @@ definitions:
       title:
         type: string
     type: object
+  model.Portfolio:
+    properties:
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/model.PortfolioItems'
+        type: array
+      studentId:
+        type: string
+    type: object
+  model.PortfolioItems:
+    properties:
+      description:
+        type: string
+      title:
+        type: string
+      url:
+        type: string
+    type: object
   repository.JobFilters:
     properties:
       employerId:
@@ -41,6 +61,15 @@ definitions:
       location:
         type: string
       title:
+        type: string
+    type: object
+  requests.CreatePortfolioRequest:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/model.PortfolioItems'
+        type: array
+      studentId:
         type: string
     type: object
   requests.RefreshTokensRequest:
@@ -587,4 +616,100 @@ paths:
       summary: Поиск вакансий
       tags:
       - jobs
+  /api/portfolios:
+    post:
+      consumes:
+      - application/json
+      description: Создает новое портфолио
+      parameters:
+      - description: Данные портфолио
+        in: body
+        name: portfolio
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreatePortfolioRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Успешно создано
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Ошибка валидации
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Создать портфолио
+      tags:
+      - portfolio
+  /api/portfolios/{portfolioId}/items:
+    post:
+      consumes:
+      - application/json
+      description: Добавляет элементы в существующее портфолио
+      parameters:
+      - description: ID портфолио
+        in: path
+        name: portfolioId
+        required: true
+        type: string
+      - description: Список элементов портфолио
+        in: body
+        name: items
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/model.PortfolioItems'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Элементы добавлены
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Ошибка валидации
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Добавить элементы в портфолио
+      tags:
+      - portfolio
+  /api/portfolios/student/{studentId}:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает портфолио по ID студента
+      parameters:
+      - description: ID студента
+        in: path
+        name: studentId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Портфолио
+          schema:
+            $ref: '#/definitions/model.Portfolio'
+        "404":
+          description: Портфолио не найдено
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Получить портфолио студента
+      tags:
+      - portfolio
 swagger: "2.0"
