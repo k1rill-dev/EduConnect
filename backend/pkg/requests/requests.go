@@ -28,8 +28,6 @@ type UpdateRequest struct {
 }
 
 type CreateJobRequest struct {
-	Id          string `bson:"_id"`
-	EmployerId  string `bson:"employer_id"`
 	Title       string `bson:"title"`
 	Description string `bson:"description"`
 	Location    string `bson:"location"`
@@ -39,6 +37,12 @@ type UpdateJobRequest struct {
 	Title       string `bson:"title"`
 	Description string `bson:"description"`
 	Location    string `bson:"location"`
+}
+
+type CreateJobApplication struct {
+	CompanyId string `bson:"company_id" validate:"required"`
+	StudentId string `bson:"student_id" validate:"required"`
+	Status    string `bson:"status"  validate:"required"`
 }
 
 type SignOutRequest struct {

@@ -21,13 +21,14 @@ import (
 )
 
 type server struct {
-	log            logger.Logger
-	cfg            *config.Config
-	echo           *echo.Echo
-	authController *controllers.AuthController
-	jobController  *controllers.JobController
-	mongoClient    *mongo.Client
-	middleware     *middlewares.MiddlewareManager
+	log                      logger.Logger
+	cfg                      *config.Config
+	echo                     *echo.Echo
+	authController           *controllers.AuthController
+	jobController            *controllers.JobController
+	jobApplicationController *controllers.ApplicationController
+	mongoClient              *mongo.Client
+	middleware               *middlewares.MiddlewareManager
 }
 
 func NewServer(log logger.Logger, cfg *config.Config) *server {
@@ -58,12 +59,14 @@ func (s *server) Run() error {
 
 	userRepo := repo.NewMongoAccountRepo(s.log, s.cfg, s.mongoClient)
 	jobRepo := repo.NewJobRepo(s.log, s.cfg, s.mongoClient)
+	jobApplicationRepo := repo.NewJobApplicationRepo(s.log, s.cfg, s.mongoClient)
 	jwtRepo := repo.NewJwtRepo(s.log, s.cfg, redisClient, mongo)
 	jwtManager := jwt.NewJwtManager(s.log, s.cfg, jwtRepo)
 	validate := s.setupValidator()
 	s.middleware = middlewares.NewMiddlewareManager(s.log, s.cfg, jwtManager)
 	s.authController = controllers.NewAuthController(s.log, s.cfg, userRepo, validate, jwtManager)
 	s.jobController = controllers.NewJobController(s.log, s.cfg, jobRepo, validate, jwtManager, userRepo)
+	s.jobApplicationController = controllers.NewApplicationController(s.log, s.cfg, jobApplicationRepo, validate, jwtManager, userRepo)
 
 	go func() {
 		if err := s.runHttpServer(); err != nil {

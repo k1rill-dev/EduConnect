@@ -15,6 +15,141 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/applications": {
+            "post": {
+                "description": "Создает новый отклик на вакансию",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "applications"
+                ],
+                "summary": "Создать отклик",
+                "parameters": [
+                    {
+                        "description": "Данные отклика",
+                        "name": "application",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.CreateJobApplication"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Успешно создано",
+                        "schema": {
+                            "$ref": "#/definitions/response.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка валидации",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/applications/{applicationId}": {
+            "delete": {
+                "description": "Удаляет отклик",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "applications"
+                ],
+                "summary": "Удалить отклик",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID отклика",
+                        "name": "applicationId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешно удалено",
+                        "schema": {
+                            "$ref": "#/definitions/response.SuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/applications/{applicationId}/status": {
+            "put": {
+                "description": "Обновляет статус существующего отклика",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "applications"
+                ],
+                "summary": "Обновить статус отклика",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID отклика",
+                        "name": "applicationId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Новый статус",
+                        "name": "status",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешно обновлено",
+                        "schema": {
+                            "$ref": "#/definitions/response.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка запроса",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/auth/refresh-tokens": {
             "post": {
                 "description": "Обновление access и refresh токенов с использованием валидного refresh токена",
@@ -468,7 +603,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/repository.UpdateJob"
+                            "$ref": "#/definitions/requests.UpdateJobRequest"
                         }
                     }
                 ],
@@ -530,19 +665,21 @@ const docTemplate = `{
                 }
             }
         },
-        "repository.UpdateJob": {
+        "requests.CreateJobApplication": {
             "type": "object",
+            "required": [
+                "companyId",
+                "status",
+                "studentId"
+            ],
             "properties": {
-                "description": {
+                "companyId": {
                     "type": "string"
                 },
-                "id": {
+                "status": {
                     "type": "string"
                 },
-                "location": {
-                    "type": "string"
-                },
-                "title": {
+                "studentId": {
                     "type": "string"
                 }
             }
@@ -551,12 +688,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "description": {
-                    "type": "string"
-                },
-                "employerId": {
-                    "type": "string"
-                },
-                "id": {
                     "type": "string"
                 },
                 "location": {
@@ -627,6 +758,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "surname": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.UpdateJobRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 }
             }

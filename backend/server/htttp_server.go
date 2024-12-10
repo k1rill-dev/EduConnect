@@ -28,6 +28,10 @@ func (s *server) mapRoutes() {
 	jobsWithAuth := s.echo.Group("/api/jobs", s.middleware.AuthMiddleware)
 	jobsWithAuth.POST("", s.jobController.CreateJob)
 	jobsWithAuth.PUT("/:jobId", s.jobController.UpdateJob)
+	applications := s.echo.Group("/api/applications", s.middleware.AuthMiddleware)
+	applications.POST("", s.jobApplicationController.CreateApplication)
+	applications.PUT("/:applicationId/status", s.jobApplicationController.UpdateApplicationStatus)
+	applications.DELETE("/:applicationId", s.jobApplicationController.DeleteApplication)
 
 	// s.echo.POST("api/auth/sign-in", s.authController.SignInWithWallet)
 	// s.echo.POST("api/auth/verify-signature", s.authController.VerifySignature)

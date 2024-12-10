@@ -21,24 +21,22 @@ definitions:
       location:
         type: string
     type: object
-  repository.UpdateJob:
+  requests.CreateJobApplication:
     properties:
-      description:
+      companyId:
         type: string
-      id:
+      status:
         type: string
-      location:
+      studentId:
         type: string
-      title:
-        type: string
+    required:
+    - companyId
+    - status
+    - studentId
     type: object
   requests.CreateJobRequest:
     properties:
       description:
-        type: string
-      employerId:
-        type: string
-      id:
         type: string
       location:
         type: string
@@ -88,6 +86,15 @@ definitions:
     - picture
     - role
     - surname
+    type: object
+  requests.UpdateJobRequest:
+    properties:
+      description:
+        type: string
+      location:
+        type: string
+      title:
+        type: string
     type: object
   requests.UpdateRequest:
     properties:
@@ -176,6 +183,95 @@ definitions:
 info:
   contact: {}
 paths:
+  /api/applications:
+    post:
+      consumes:
+      - application/json
+      description: Создает новый отклик на вакансию
+      parameters:
+      - description: Данные отклика
+        in: body
+        name: application
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateJobApplication'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Успешно создано
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Ошибка валидации
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Создать отклик
+      tags:
+      - applications
+  /api/applications/{applicationId}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет отклик
+      parameters:
+      - description: ID отклика
+        in: path
+        name: applicationId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешно удалено
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Удалить отклик
+      tags:
+      - applications
+  /api/applications/{applicationId}/status:
+    put:
+      consumes:
+      - application/json
+      description: Обновляет статус существующего отклика
+      parameters:
+      - description: ID отклика
+        in: path
+        name: applicationId
+        required: true
+        type: string
+      - description: Новый статус
+        in: query
+        name: status
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешно обновлено
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Ошибка запроса
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Обновить статус отклика
+      tags:
+      - applications
   /api/auth/refresh-tokens:
     post:
       consumes:
@@ -401,7 +497,7 @@ paths:
         name: updateJob
         required: true
         schema:
-          $ref: '#/definitions/repository.UpdateJob'
+          $ref: '#/definitions/requests.UpdateJobRequest'
       produces:
       - application/json
       responses:
