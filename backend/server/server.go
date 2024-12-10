@@ -57,18 +57,17 @@ func (s *server) Run() error {
 		return err
 	}
 
-	userRepo := repo.NewMongoAccountRepo(s.log, s.cfg, s.mongoClient)
-	jwtRepo := repo.NewJwtRepo(s.log, s.cfg, redisClient, mongo)
-	jwtManager := jwt.NewJwtManager(s.log, s.cfg, jwtRepo)
-	validate := s.setupValidator()
-	s.middleware = middlewares.NewMiddlewareManager(s.log, s.cfg, jwtManager)
-	s.authController = controllers.NewAuthController(s.log, s.cfg, userRepo, validate, jwtManager)
-
 	s3Storage, err := s3.NewS3Storage(s.log, s.cfg, s.mongoClient)
 	if err != nil {
 		s.log.Fatalf("S3Storage failed to start: %v", err)
 	}
 	s.s3 = s3Storage
+	userRepo := repo.NewMongoAccountRepo(s.log, s.cfg, s.mongoClient)
+	jwtRepo := repo.NewJwtRepo(s.log, s.cfg, redisClient, mongo)
+	jwtManager := jwt.NewJwtManager(s.log, s.cfg, jwtRepo)
+	validate := s.setupValidator()
+	s.middleware = middlewares.NewMiddlewareManager(s.log, s.cfg, jwtManager)
+	s.authController = controllers.NewAuthController(s.log, s.cfg, userRepo, validate, jwtManager, s3Storage)
 
 	go func() {
 		if err := s.runHttpServer(); err != nil {

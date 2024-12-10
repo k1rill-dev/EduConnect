@@ -24,10 +24,11 @@ func (s *server) mapRoutes() {
 	s3Group.Use(middleware.Logger())
 	s3Group.Use(middleware.Recover())
 
-	s3Group.POST("/upload", s.s3.UploadFile)
+	// s3Group.POST("/upload", s.s3.UploadFile)
 	s3Group.GET("/files/:id", s.s3.DownloadFile)
 	s3Group.GET("/link/:id", s.s3.GetFileLink)
-	s3Group.DELETE("/files/:id", s.s3.DeleteFile)
+	// s3Group.DELETE("/files/:id", s.s3.DeleteFile)
+
 	// s.echo.POST("api/auth/sign-in", s.authController.SignInWithWallet)
 	// s.echo.POST("api/auth/verify-signature", s.authController.VerifySignature)
 	// s.echo.POST("api/auth/refresh-tokens", s.authController.RefreshTokens)
