@@ -84,9 +84,9 @@ const CreateCoursePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-r from-green-500 to-blue-600 text-white py-10 shadow-md">
-        <div className="container mx-auto px-6 text-center">
+    <div className="min-h-screen bg-gray-50 bg-gradient-to-r from-indigo-50 to-purple-100">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-10 shadow-md">
+        <div className="container mx-auto px-6 text-center ">
           <h1 className="text-4xl font-bold">Создать курс</h1>
           <p className="mt-2 text-lg">Заполните форму ниже, чтобы опубликовать новый курс.</p>
         </div>

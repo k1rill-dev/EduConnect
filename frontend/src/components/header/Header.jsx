@@ -3,7 +3,7 @@ import { Navbar, Dropdown, Button } from 'flowbite-react';
 
 const Header = () => {
   return (
-    <Navbar fluid={true} rounded={true}>
+    <Navbar fluid={true} rounded={true} className={"mr-5"}>
       <Navbar.Brand href="/">
         <img
           src="/logo.svg"
@@ -22,10 +22,13 @@ const Header = () => {
         <Navbar.Link href="/courses">Курсы</Navbar.Link>
         <Navbar.Link href="/jobs">Вакансии</Navbar.Link>
         <Navbar.Link href="/forum">Форум</Navbar.Link>
+
+        {/* Выпадающий список "Профиль" */}
         <Dropdown
           label="Профиль"
           inline={true}
           arrowIcon={true}
+          className="relative z-10"
         >
           <Dropdown.Item href="/profile">
             Мой профиль
@@ -39,9 +42,6 @@ const Header = () => {
           </Dropdown.Item>
         </Dropdown>
       </Navbar.Collapse>
-      <Button color="primary" href="/login">
-        Войти
-      </Button>
     </Navbar>
   );
 };

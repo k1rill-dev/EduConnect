@@ -13,6 +13,8 @@ import ProfilePage from "./components/pages/ProfilePage";
 import CreateJobPage from "./components/pages/CreateJobPage";
 import CreateCoursePage from "./components/pages/CreateCoursePage";
 import EditProfilePage from "./components/pages/EditProfilePage";
+import JobsPage from "./components/pages/JobsPage";
+import JobDetailPage from "./components/pages/JobDetailPage";
 
 function App() {
  return (
@@ -104,6 +106,30 @@ function App() {
 
                         <div className="flex-grow">
                             <EditProfilePage/>
+                        </div>
+
+                        <Footer/>
+                    </div>
+                )}>
+                </Route>
+                <Route path="/jobs" element={(
+                    <div className="flex flex-col min-h-screen">
+                        <Header/>
+
+                        <div className="flex-grow">
+                            <JobsPage/>
+                        </div>
+
+                        <Footer/>
+                    </div>
+                )}>
+                </Route>
+                <Route path="/jobs/:jobId" element={(
+                    <div className="flex flex-col min-h-screen">
+                        <Header/>
+
+                        <div className="flex-grow">
+                            <JobDetailPage/>
                         </div>
 
                         <Footer/>

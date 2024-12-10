@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Badge, Button } from 'flowbite-react';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const userProfile = {
   name: 'Иван Иванов',
@@ -20,7 +20,8 @@ const userProfile = {
 };
 
 const ProfilePage = () => {
-  const nav = useNavigate()
+  const nav = useNavigate();
+
   const renderContent = () => {
     switch (userProfile.role) {
       case 'student':
@@ -98,17 +99,23 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-10 shadow-lg">
+    <div className="min-h-screen bg-gradient-to-r from-indigo-50 to-purple-100">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-12 shadow-md">
         <div className="container mx-auto px-6 text-center">
-          <h1 className="text-4xl font-bold">{userProfile.name}</h1>
+          <h1 className="text-4xl font-extrabold">{userProfile.name}</h1>
           <p className="text-lg mt-2">
             Роль: <span className="capitalize">{userProfile.role}</span>
           </p>
           <div className="mt-6">{renderActionButton()}</div>
         </div>
       </div>
-      <div className="container mx-auto px-6 py-10">{renderContent()}</div>
+
+      <div className="container mx-auto px-6 py-12">
+        <div className="space-y-10">
+          {/* Блок с курсами или вакансиями в зависимости от роли */}
+          {renderContent()}
+        </div>
+      </div>
     </div>
   );
 };

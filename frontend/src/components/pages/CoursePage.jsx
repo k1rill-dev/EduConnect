@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button } from 'flowbite-react';
+import { Button } from 'flowbite-react'; // Для получения ID курса из URL
 
 const CoursePage = () => {
   const [course, setCourse] = useState(null);
@@ -57,38 +57,58 @@ const CoursePage = () => {
   }
 
   return (
-    <div className="flex flex-col items-center py-8 px-4 sm:px-6 lg:px-8 bg-gray-50 min-h-screen">
-      <div className="max-w-4xl w-full bg-white p-8 rounded-lg shadow-lg">
-        <div className="mb-6">
-          <img className="w-full h-96 object-cover rounded-lg" src={course.photo} alt={course.title} />
+    <div className="min-h-screen bg-gradient-to-r from-indigo-50 to-purple-100">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-12 shadow-md">
+        <div className="container mx-auto px-6 text-center">
+          <h1 className="text-4xl font-extrabold">{course.title}</h1>
+          <p className="mt-2 text-lg">{course.description}</p>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-6 py-12 flex">
+        {/* Боковая панель */}
+        <div className="w-1/4 space-y-4">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold text-indigo-600">Информация о курсе</h2>
+            <p><strong>Преподаватель:</strong> Преподаватель #{course.teacher_id}</p>
+            <p><strong>Дата начала:</strong> {new Date(course.start_date).toLocaleDateString()}</p>
+            <p><strong>Дата окончания:</strong> {new Date(course.end_date).toLocaleDateString()}</p>
+            <p><strong>Дата создания:</strong> {new Date(course.created_at).toLocaleDateString()}</p>
+          </div>
         </div>
 
-        <h1 className="text-4xl font-bold text-gray-800 mb-4">{course.title}</h1>
+        {/* Основное содержимое курса */}
+        <div className="w-3/4 ml-8">
+          <div className="bg-white p-8 rounded-lg shadow-xl space-y-6">
+            {/* Картинка курса */}
+            <div className="mb-6">
+              <img className="w-full h-96 object-cover rounded-lg" src={course.photo} alt={course.title} />
+            </div>
+            {/* Программа курса */}
+            <h2 className="text-3xl font-semibold text-gray-800 mb-4">Программа курса</h2>
+            <ul className="list-inside list-disc space-y-2 text-lg text-gray-700">
+              {course.syllabus.map((topic, index) => (
+                <li key={index}>{topic}</li>
+              ))}
+            </ul>
 
-        <p className="text-xl text-gray-600 mb-6">{course.description}</p>
-
-        <div className="space-y-4 text-lg text-gray-700 mb-6">
-          <p><strong>Преподаватель:</strong> Преподаватель #{course.teacher_id}</p>
-          <p><strong>Дата начала:</strong> {new Date(course.start_date).toLocaleDateString()}</p>
-          <p><strong>Дата окончания:</strong> {new Date(course.end_date).toLocaleDateString()}</p>
-          <p><strong>Дата создания:</strong> {new Date(course.created_at).toLocaleDateString()}</p>
+            {/* Кнопки */}
+            <div className="flex space-x-4 mt-6">
+              <Button
+                href={`/courses/${course.course_id}/enroll`}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3"
+              >
+                Записаться на курс
+              </Button>
+              <Button
+                href={`/courseStudent/${course.course_id}/`}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3"
+              >
+                Перейти на курс
+              </Button>
+            </div>
+          </div>
         </div>
-
-        <div className="bg-gray-100 p-6 rounded-lg mb-6">
-          <h2 className="text-3xl font-semibold text-gray-800 mb-4">Программа курса</h2>
-          <ul className="list-inside list-disc space-y-2">
-            {course.syllabus.map((topic, index) => (
-              <li key={index} className="text-lg text-gray-700">{topic}</li>
-            ))}
-          </ul>
-        </div>
-
-        <Button href={`/courses/${course.course_id}/enroll`} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3">
-          Записаться на курс
-        </Button>
-        <Button href={`/courseStudent/${course.course_id}/`} className="w-full bg-blue-600 mt-3 hover:bg-blue-700 text-white py-3">
-          Перейти на курс
-        </Button>
       </div>
     </div>
   );
