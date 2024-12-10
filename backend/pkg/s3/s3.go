@@ -53,19 +53,19 @@ func (s *S3Storage) UploadFile(base64Photo string) (string, error) {
 		return "", fmt.Errorf("ошибка декодирования Base64: %w", err)
 	}
 
-	fileName := s.generateFileName()
-	fileID := fmt.Sprintf("%s.jpg", fileName)
-	filePath := filepath.Join(storagePath, fileID)
+	fileId := s.generateFileName()
+	fileName := fmt.Sprintf("%s.jpg", fileId)
+	filePath := filepath.Join(storagePath, fileName)
 
 	err = os.WriteFile(filePath, fileData, os.ModePerm)
 	if err != nil {
 		return "", fmt.Errorf("ошибка сохранения файла: %w", err)
 	}
 
-	downloadURL := fmt.Sprintf("http://localhost:8083/files/%s", fileID)
+	downloadURL := fmt.Sprintf("http://localhost%s/api/files/%s", s.cfg.Http.Port, fileName)
 
 	fileInfo := FileInfo{
-		ID:        fileID,
+		ID:        fileId,
 		FileName:  fileName,
 		UploadURL: downloadURL,
 	}
