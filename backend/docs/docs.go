@@ -234,15 +234,23 @@ const docTemplate = `{
         "requests.SignUpRequest": {
             "type": "object",
             "required": [
+                "bio",
                 "email",
                 "password",
+                "picture",
                 "role"
             ],
             "properties": {
+                "bio": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                },
+                "picture": {
                     "type": "string"
                 },
                 "role": {

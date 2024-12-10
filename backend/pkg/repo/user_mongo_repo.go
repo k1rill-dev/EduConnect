@@ -2,6 +2,7 @@ package repo
 
 import (
 	"EduConnect/internal/model"
+	"EduConnect/internal/values"
 	"EduConnect/pkg/config"
 	"EduConnect/pkg/logger"
 	"context"
@@ -51,7 +52,7 @@ func (m *UserMongoRepo) GetById(ctx context.Context, userId string) (*model.User
 	return &user, nil
 }
 
-func (m *UserMongoRepo) GetByEmail(ctx context.Context, email string) (*model.User, error) {
+func (m *UserMongoRepo) GetByEmail(ctx context.Context, email *values.Email) (*model.User, error) {
 	var user model.User
 	if err := m.getUserCollection().FindOne(ctx, bson.M{"email": email}).Decode(&user); err != nil {
 		return nil, err

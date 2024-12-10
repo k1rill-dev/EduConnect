@@ -2,6 +2,8 @@ package server
 
 import (
 	_ "EduConnect/docs"
+
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 func (s *server) runHttpServer() error {
@@ -26,5 +28,5 @@ func (s *server) mapRoutes() {
 
 	// s.echo.POST("api/auth/verify-token", s.authController.VerifyToken)
 
-	// s.echo.GET("/swagger/*", echoSwagger.WrapHandler)
+	s.echo.GET("/swagger/*", echoSwagger.WrapHandler)
 }

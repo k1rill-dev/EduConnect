@@ -3,6 +3,8 @@ package requests
 type SignUpRequest struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
+	Picture  string `json:"picture" validate:"required"`
+	Bio      string `json:"bio" validate:"required"`
 	Role     string `json:"role" validate:"required"`
 }
 
