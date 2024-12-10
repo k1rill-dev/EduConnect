@@ -15,6 +15,7 @@ mongo:
 mongoCollections:
   users: users
   refreshTokens: refreshTokens
+  s3: s3
 
 accessTokenExp: 3600s
 refreshTokenExp: 86400s

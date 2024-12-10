@@ -9,6 +9,7 @@ import (
 	"EduConnect/pkg/mongodb"
 	"EduConnect/pkg/redis"
 	"EduConnect/pkg/repo"
+	"EduConnect/pkg/s3"
 	"context"
 	"os"
 	"os/signal"
@@ -27,6 +28,7 @@ type server struct {
 	authController *controllers.AuthController
 	mongoClient    *mongo.Client
 	middleware     *middlewares.MiddlewareManager
+	s3             *s3.S3Storage
 }
 
 func NewServer(log logger.Logger, cfg *config.Config) *server {
@@ -61,6 +63,12 @@ func (s *server) Run() error {
 	validate := s.setupValidator()
 	s.middleware = middlewares.NewMiddlewareManager(s.log, s.cfg, jwtManager)
 	s.authController = controllers.NewAuthController(s.log, s.cfg, userRepo, validate, jwtManager)
+
+	s3Storage, err := s3.NewS3Storage(s.log, s.cfg, s.mongoClient)
+	if err != nil {
+		s.log.Fatalf("S3Storage failed to start: %v", err)
+	}
+	s.s3 = s3Storage
 
 	go func() {
 		if err := s.runHttpServer(); err != nil {
