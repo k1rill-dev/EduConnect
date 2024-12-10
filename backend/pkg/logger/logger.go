@@ -4,7 +4,6 @@ import "github.com/sirupsen/logrus"
 
 type Config struct {
 	LogLevel string
-	DevMode  bool
 }
 
 type Logger interface {
@@ -35,7 +34,7 @@ var loggerLevelMap = map[string]logrus.Level{
 }
 
 func NewAppLogger(cfg *Config) *appLogger {
-	return &appLogger{level: cfg.LogLevel, devMode: cfg.DevMode}
+	return &appLogger{level: cfg.LogLevel}
 }
 
 func (l *appLogger) InitLogger() {
