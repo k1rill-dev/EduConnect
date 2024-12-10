@@ -16,7 +16,7 @@ func NewPassword(password string) (*Password, error) {
 	if !isValidPassword(password) {
 		return nil, fmt.Errorf("invalid password: %s", password)
 	}
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 	if err != nil {
 		return nil, err
 	}

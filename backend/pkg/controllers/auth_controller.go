@@ -54,14 +54,18 @@ func (a *AuthController) SignUp(ctx echo.Context) error {
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Email error: %v", err)})
 	}
+	if user, _ := a.userRepository.GetByEmail(context.Background(), email); user != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "user already exist"})
+	}
 	hashedPassword, err := values.NewPassword(req.Password)
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Password error: %v", err)})
 	}
 
+	//TODO: Добавить сохранение фотки и ниже уже ссылку пихать
 	userUuid, _ := uuid.NewV7()
 	userId := userUuid.String()
-	user := model.NewUser(userId, email, hashedPassword, "Пока так", time.Now(), req.Role)
+	user := model.NewUser(userId, email, hashedPassword, req.Picture, req.Bio, time.Now(), req.Role)
 
 	deviceUuid, _ := uuid.NewV7()
 	deviceId := deviceUuid.String()
@@ -101,7 +105,12 @@ func (a *AuthController) SignIn(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Validation error: %v", err)})
 	}
 
-	dbUser, err := a.userRepository.GetByEmail(context.Background(), req.Email)
+	email, err := values.NewEmail(req.Email)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Email error: %v", err)})
+	}
+
+	dbUser, err := a.userRepository.GetByEmail(context.Background(), email)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": fmt.Sprintf("Internal server error: %v", err)})
 	}
