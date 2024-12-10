@@ -1,4 +1,50 @@
 definitions:
+  model.Job:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      employerId:
+        type: string
+      id:
+        type: string
+      location:
+        type: string
+      title:
+        type: string
+    type: object
+  repository.JobFilters:
+    properties:
+      employerId:
+        type: string
+      location:
+        type: string
+    type: object
+  repository.UpdateJob:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      location:
+        type: string
+      title:
+        type: string
+    type: object
+  requests.CreateJobRequest:
+    properties:
+      description:
+        type: string
+      employerId:
+        type: string
+      id:
+        type: string
+      location:
+        type: string
+      title:
+        type: string
+    type: object
   requests.RefreshTokensRequest:
     properties:
       refresh_token:
@@ -100,6 +146,13 @@ definitions:
     required:
     - access_token
     - refresh_token
+    type: object
+  response.SuccessResponse:
+    properties:
+      message:
+        type: string
+    required:
+    - message
     type: object
   response.UpdateResponse:
     properties:
@@ -274,4 +327,168 @@ paths:
       summary: Обновления пользователя
       tags:
       - auth
+  /api/jobs:
+    post:
+      consumes:
+      - application/json
+      description: Создает новую вакансию
+      parameters:
+      - description: Данные для создания вакансии
+        in: body
+        name: job
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateJobRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Успешно создано
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Ошибка валидации
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Создать вакансию
+      tags:
+      - jobs
+  /api/jobs/{jobId}:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает вакансию по ее ID
+      parameters:
+      - description: ID вакансии
+        in: path
+        name: jobId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация о вакансии
+          schema:
+            $ref: '#/definitions/model.Job'
+        "404":
+          description: Вакансия не найдена
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Получить вакансию по ID
+      tags:
+      - jobs
+    put:
+      consumes:
+      - application/json
+      description: Обновляет данные существующей вакансии
+      parameters:
+      - description: ID вакансии
+        in: path
+        name: jobId
+        required: true
+        type: string
+      - description: Данные для обновления вакансии
+        in: body
+        name: updateJob
+        required: true
+        schema:
+          $ref: '#/definitions/repository.UpdateJob'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешно обновлено
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Ошибка валидации
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Обновить вакансию
+      tags:
+      - jobs
+  /api/jobs/filter:
+    post:
+      consumes:
+      - application/json
+      description: Возвращает список вакансий, соответствующих заданным фильтрам
+      parameters:
+      - description: Фильтры вакансий
+        in: body
+        name: filters
+        required: true
+        schema:
+          $ref: '#/definitions/repository.JobFilters'
+      - description: Номер страницы
+        in: query
+        name: page
+        type: integer
+      - description: Количество записей на странице
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список вакансий
+          schema:
+            items:
+              $ref: '#/definitions/model.Job'
+            type: array
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Фильтр вакансий
+      tags:
+      - jobs
+  /api/jobs/search:
+    get:
+      consumes:
+      - application/json
+      description: Поиск вакансий по названию
+      parameters:
+      - description: Название вакансии
+        in: query
+        name: title
+        required: true
+        type: string
+      - description: Номер страницы
+        in: query
+        name: page
+        type: integer
+      - description: Количество записей на странице
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список вакансий
+          schema:
+            items:
+              $ref: '#/definitions/model.Job'
+            type: array
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Поиск вакансий
+      tags:
+      - jobs
 swagger: "2.0"

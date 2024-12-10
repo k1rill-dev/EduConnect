@@ -4,16 +4,16 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="242fffd4-1ffd-4914-bfd1-2cee8835a3eb" name="Changes" comment="added update user method">
+    <list default="true" id="242fffd4-1ffd-4914-bfd1-2cee8835a3eb" name="Changes" comment="added first name and surname fields to model.&#10;Recreated auth controllers :))">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/docs/docs.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docs/docs.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/docs/swagger.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docs/swagger.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/docs/swagger.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docs/swagger.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/internal/model/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/internal/model/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/internal/repository/user_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/internal/repository/user_repository.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pkg/controllers/auth_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pkg/controllers/auth_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/internal/model/job.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/internal/model/job.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/pkg/requests/requests.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pkg/requests/requests.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/pkg/response/responses.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pkg/response/responses.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/server/htttp_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/server/htttp_server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/server/server.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,6 +25,7 @@
       <list>
         <option value="JavaScript File" />
         <option value="JSX File" />
+        <option value="Go File" />
       </list>
     </option>
   </component>
@@ -63,6 +64,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "DefaultGoTemplateProperty": "Go File",
     "Go Build.go build EduConnect.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.go.formatter.settings.were.checked": "true",
@@ -120,7 +122,8 @@
     <MESSAGE value="added dockerfile" />
     <MESSAGE value="added field to create course page" />
     <MESSAGE value="added update user method" />
-    <option name="LAST_COMMIT_MESSAGE" value="added update user method" />
+    <MESSAGE value="added first name and surname fields to model.&#10;Recreated auth controllers :))" />
+    <option name="LAST_COMMIT_MESSAGE" value="added first name and surname fields to model.&#10;Recreated auth controllers :))" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

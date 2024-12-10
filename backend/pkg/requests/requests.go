@@ -27,5 +27,19 @@ type UpdateRequest struct {
 	Bio       string `json:"bio" validate:"required"`
 }
 
+type CreateJobRequest struct {
+	Id          string `bson:"_id"`
+	EmployerId  string `bson:"employer_id"`
+	Title       string `bson:"title"`
+	Description string `bson:"description"`
+	Location    string `bson:"location"`
+}
+
+type UpdateJobRequest struct {
+	Title       string `bson:"title"`
+	Description string `bson:"description"`
+	Location    string `bson:"location"`
+}
+
 type SignOutRequest struct {
 }

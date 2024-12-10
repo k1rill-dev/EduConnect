@@ -29,3 +29,7 @@ type UpdateResponse struct {
 type ErrorResponse struct {
 	Error string `json:"error" validate:"required"`
 }
+
+type SuccessResponse struct {
+	Message string `json:"message" validate:"required"`
+}
