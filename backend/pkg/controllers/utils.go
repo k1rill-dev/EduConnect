@@ -10,11 +10,11 @@ import (
 )
 
 func ComparePasswords(userHashedPassword values.Password, incomingPassword string) error {
-	result := bcrypt.CompareHashAndPassword(userHashedPassword.GetPassword(), []byte(incomingPassword))
-	if result == nil {
-		return nil
+	err := bcrypt.CompareHashAndPassword(userHashedPassword.GetPassword(), []byte(incomingPassword))
+	if err != nil {
+		return fmt.Errorf("invalid password: %w", err)
 	}
-	return result
+	return nil
 }
 
 func (a *AuthController) decodeRequest(ctx echo.Context, i interface{}) error {
