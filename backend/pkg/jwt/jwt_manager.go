@@ -24,7 +24,7 @@ import (
 )
 
 type JwtManager interface {
-	GenerateTokens(ctx context.Context, accountID string, deviceId string, walletPub string, role string) (string, string, error)
+	GenerateTokens(ctx context.Context, accountID string, deviceId string, email string, role string) (string, string, error)
 	VerifyToken(context context.Context, accessToken string) (jwt.MapClaims, error)
 	RefreshToken(ctx context.Context, refreshToken string) (newAccessToken string, newRefreshToken string, err error)
 	IsRevokedToken(ctx context.Context, accountId string, deviceId string, accessToken string) bool
@@ -60,13 +60,13 @@ func NewJwtManager(log logger.Logger, cfg *config.Config, jwtRepo repository.Jwt
 	}
 }
 
-func (j *jwtManager) GenerateTokens(ctx context.Context, accountID string, deviceId string, walletPub string, role string) (accessToken, refreshToken string, err error) {
-	accessToken, err = j.generateAccessToken(ctx, accountID, walletPub, deviceId, role)
+func (j *jwtManager) GenerateTokens(ctx context.Context, accountID string, deviceId string, email string, role string) (accessToken, refreshToken string, err error) {
+	accessToken, err = j.generateAccessToken(ctx, accountID, email, deviceId, role)
 	if err != nil {
 		return "", "", err
 	}
 
-	refreshToken, err = j.generateRefreshToken(ctx, accountID, walletPub, deviceId, role)
+	refreshToken, err = j.generateRefreshToken(ctx, accountID, email, deviceId, role)
 	if err != nil {
 		return "", "", err
 	}
@@ -74,14 +74,14 @@ func (j *jwtManager) GenerateTokens(ctx context.Context, accountID string, devic
 	return accessToken, refreshToken, nil
 }
 
-func (j *jwtManager) generateAccessToken(ctx context.Context, accountId, walletPub, deviceId, role string) (string, error) {
+func (j *jwtManager) generateAccessToken(ctx context.Context, accountId, email, deviceId, role string) (string, error) {
 	jti, _ := uuid.NewV7()
 	accountClaims := &model.AccountClaims{
 		Jti:       jti.String(),
 		Iat:       time.Now().Unix(),
 		Exp:       time.Now().Add(j.accessExp).Unix(),
 		Sub:       accountId,
-		WalletPub: walletPub,
+		Email:     email,
 		DeviceId:  deviceId,
 		Iss:       "auth.service",
 		Role:      role,
@@ -102,14 +102,14 @@ func (j *jwtManager) generateAccessToken(ctx context.Context, accountId, walletP
 	return tokenValue, nil
 }
 
-func (j *jwtManager) generateRefreshToken(ctx context.Context, accountId, walletPub, deviceId, role string) (string, error) {
+func (j *jwtManager) generateRefreshToken(ctx context.Context, accountId, email, deviceId, role string) (string, error) {
 	jti, _ := uuid.NewV7()
 	accountClaims := &model.AccountClaims{
 		Jti:       jti.String(),
 		Iat:       time.Now().Unix(),
 		Exp:       time.Now().Add(j.refreshExp).Unix(),
 		Sub:       accountId,
-		WalletPub: walletPub,
+		Email:     email,
 		DeviceId:  deviceId,
 		Iss:       "auth.service",
 		Role:      role,

@@ -1,30 +1,32 @@
 package server
 
 import (
-	"EduConnect/internal/repo"
 	"EduConnect/pkg/config"
+	"EduConnect/pkg/controllers"
 	"EduConnect/pkg/jwt"
 	"EduConnect/pkg/logger"
 	"EduConnect/pkg/middlewares"
 	"EduConnect/pkg/mongodb"
 	"EduConnect/pkg/redis"
+	"EduConnect/pkg/repo"
 	"context"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	echo "github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type server struct {
-	log  logger.Logger
-	cfg  *config.Config
-	echo *echo.Echo
-	// authController *controllers.AuthController
-	mongoClient *mongo.Client
-	middleware  *middlewares.MiddlewareManager
+	log            logger.Logger
+	cfg            *config.Config
+	echo           *echo.Echo
+	authController *controllers.AuthController
+	mongoClient    *mongo.Client
+	middleware     *middlewares.MiddlewareManager
 }
 
 func NewServer(log logger.Logger, cfg *config.Config) *server {
@@ -53,14 +55,12 @@ func (s *server) Run() error {
 		return err
 	}
 
-	// accountRepo := repo.NewMongoAccountRepo(s.log, s.cfg, mongo)
-	// nonceRepo := repo.NewNonceRedisRepo(s.log, redisClient)
+	userRepo := repo.NewMongoAccountRepo(s.log, s.cfg, s.mongoClient)
 	jwtRepo := repo.NewJwtRepo(s.log, s.cfg, redisClient, mongo)
 	jwtManager := jwt.NewJwtManager(s.log, s.cfg, jwtRepo)
-	// nonceManager := nonce.NewNonceManager(s.log, s.cfg.Nonce, nonceRepo)
-	// validate := s.setupValidator()
+	validate := s.setupValidator()
 	s.middleware = middlewares.NewMiddlewareManager(s.log, s.cfg, jwtManager)
-	// s.authController = controllers.NewAuthController(s.log, s.cfg, accountRepo, nonceManager, validate, jwtManager)
+	s.authController = controllers.NewAuthController(s.log, s.cfg, userRepo, validate, jwtManager)
 
 	go func() {
 		if err := s.runHttpServer(); err != nil {
@@ -86,25 +86,13 @@ func (s *server) Run() error {
 	return nil
 }
 
-// func (s *server) setupValidator() *validator.Validate {
-// 	validate := validator.New()
+func (s *server) setupValidator() *validator.Validate {
+	validate := validator.New()
 
-// 	validate.RegisterValidation("eth_addr", func(fl validator.FieldLevel) bool {
-// 		addr := fl.Field().String()
-// 		return common.IsHexAddress(addr)
-// 	})
+	// validate.RegisterValidation("eth_addr", func(fl validator.FieldLevel) bool {
+	// 	addr := fl.Field().String()
+	// 	return common.IsHexAddress(addr)
+	// })
 
-// 	en := en.New()
-// 	uni := ut.New(en, en)
-
-// 	trans, _ := uni.GetTranslator("en")
-// 	en_translations.RegisterDefaultTranslations(validate, trans)
-// 	validate.RegisterTranslation("eth_addr", trans, func(ut ut.Translator) error {
-// 		return ut.Add("eth_addr", "{0} must be a valid Ethereum address", true)
-// 	}, func(ut ut.Translator, fe validator.FieldError) string {
-// 		t, _ := ut.T("eth_addr", fe.Field())
-// 		return t
-// 	}) // Убрать потом все равно не сильно помогает
-
-// 	return validate
-// }
+	return validate
+}

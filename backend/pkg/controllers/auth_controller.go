@@ -1,6 +1,9 @@
 package controllers
 
 import (
+	"EduConnect/internal/model"
+	"EduConnect/internal/repository"
+	"EduConnect/internal/values"
 	"EduConnect/pkg/config"
 	"EduConnect/pkg/jwt"
 	"EduConnect/pkg/logger"
@@ -8,23 +11,122 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/gofrs/uuid"
 	jwt5 "github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
 type AuthController struct {
-	log logger.Logger
-	cfg *config.Config
-	// accountRepo  repository.AccountRepository
-	validate *validator.Validate
-	// nonceManager nonce.NonceManager
-	jwtManager jwt.JwtManager
+	log            logger.Logger
+	cfg            *config.Config
+	validate       *validator.Validate
+	jwtManager     jwt.JwtManager
+	userRepository repository.UserRepository
 }
 
-func NewAuthController(log logger.Logger, cfg *config.Config, validator *validator.Validate, jwtManager jwt.JwtManager) *AuthController {
-	return &AuthController{log: log, cfg: cfg, validate: validator, jwtManager: jwtManager}
+func NewAuthController(log logger.Logger, cfg *config.Config, userRepository repository.UserRepository, validator *validator.Validate, jwtManager jwt.JwtManager) *AuthController {
+	return &AuthController{log: log, cfg: cfg, userRepository: userRepository, validate: validator, jwtManager: jwtManager}
+}
+
+// SignUp godoc
+// @Summary Регистрация пользователя
+// @Description Создаёт нового пользователя
+// @Tags auth
+// @Accept  json
+// @Produce  json
+// @Param   signUpRequest body requests.SignUpRequest true "Данные для регистрации"
+// @Success 200 {object} response.SignUpResponse "Tokens"
+// @Failure 400 {object} response.ErrorResponse "Ошибка валидации"
+// @Failure 500 {object} response.ErrorResponse "Внутренняя ошибка сервера"
+// @Router /auth/sign-up [post]
+func (a *AuthController) SignUp(ctx echo.Context) error {
+	a.log.Infof("(AuthController.SignUp)")
+	var req requests.SignUpRequest
+	if err := a.decodeRequest(ctx, &req); err != nil {
+		a.log.Debugf("Failed to validate request SignUp: %v", err)
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Validation error: %v", err)})
+	}
+
+	email, err := values.NewEmail(req.Email)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Email error: %v", err)})
+	}
+	hashedPassword, err := values.NewPassword(req.Password)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Password error: %v", err)})
+	}
+
+	userUuid, _ := uuid.NewV7()
+	userId := userUuid.String()
+	user := model.NewUser(userId, email, hashedPassword, "Пока так", time.Now(), req.Role)
+
+	deviceUuid, _ := uuid.NewV7()
+	deviceId := deviceUuid.String()
+
+	if err := a.userRepository.Create(context.Background(), user); err != nil {
+		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": fmt.Sprintf("Internal server error by create user: %v", err)})
+	}
+
+	accessToken, refreshToken, err := a.jwtManager.GenerateTokens(context.Background(), userId, deviceId, req.Email, req.Role)
+	if err != nil {
+		a.log.Debugf("(GenerateTokens) Failed to generate tokens: %v", err)
+		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": fmt.Sprintf("Internal server error: %v", err)})
+	}
+
+	return ctx.JSON(http.StatusOK, map[string]string{
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+	})
+}
+
+// SignIn godoc
+// @Summary Вход пользователя
+// @Description Авторизация пользователя по email и паролю
+// @Tags auth
+// @Accept  json
+// @Produce  json
+// @Param   signInRequest body requests.SignInRequest true "Данные для входа"
+// @Success 200 {object} response.SignInResponse "Tokens"
+// @Failure 400 {object} response.ErrorResponse "Ошибка валидации или неверные учетные данные"
+// @Failure 500 {object} response.ErrorResponse "Внутренняя ошибка сервера"
+// @Router /auth/sign-in [post]
+func (a *AuthController) SignIn(ctx echo.Context) error {
+	a.log.Infof("(AuthController.SignIn)")
+	var req requests.SignInRequest
+	if err := a.decodeRequest(ctx, &req); err != nil {
+		a.log.Debugf("Failed to validate request SignIn: %v", err)
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Validation error: %v", err)})
+	}
+
+	dbUser, err := a.userRepository.GetByEmail(context.Background(), req.Email)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": fmt.Sprintf("Internal server error: %v", err)})
+	}
+
+	hashedPassword, err := values.NewPassword(req.Password)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Internal server error by check password: %v", err)})
+	}
+
+	if err := ComparePasswords(*hashedPassword, req.Password); err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("%v", err)})
+	}
+
+	deviceUuid, _ := uuid.NewV7()
+	deviceId := deviceUuid.String()
+	accessToken, refreshToken, err := a.jwtManager.GenerateTokens(context.Background(), dbUser.Id, deviceId, req.Email, dbUser.Role)
+	if err != nil {
+		a.log.Debugf("(GenerateTokens) Failed to generate tokens: %v", err)
+		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": fmt.Sprintf("Internal server error: %v", err)})
+	}
+
+	return ctx.JSON(http.StatusOK, map[string]string{
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+	})
 }
 
 // RefreshTokens godoc
@@ -58,17 +160,17 @@ func (a *AuthController) RefreshTokens(ctx echo.Context) error {
 	})
 }
 
-// RefreshTokens godoc
-// @Summary Обновление Access и Refresh токенов
-// @Description Обновление access и refresh токенов с использованием валидного refresh токена
+// SignOut godoc
+// @Summary Выход пользователя
+// @Description Завершение сессии пользователя с аннулированием токенов
 // @Tags auth
 // @Accept  json
 // @Produce  json
-// @Param   refreshTokens body requests.SignOutRequest true "RefreshTokens Request"
-// @Success 200 {object} response.SignOutResponse "Пустой ответ при успешном выходе"
-// @Failure 400 {object} response.ErrorResponse "При неверных токенах доступа"
+// @Param   signOutRequest body requests.SignOutRequest true "Данные для выхода"
+// @Success 200 {object} response.SignOutResponse "Пустой ответ при успешном завершении"
+// @Failure 400 {object} response.ErrorResponse "Ошибка валидации или неверные данные"
 // @Failure 500 {object} response.ErrorResponse "Внутренняя ошибка сервера"
-// @Router /api/auth/refresh-tokens [post]
+// @Router /auth/sign-out [post]
 func (a *AuthController) SignOut(ctx echo.Context) error {
 	var req requests.SignOutRequest
 	if err := a.decodeRequest(ctx, &req); err != nil {
@@ -90,23 +192,3 @@ func (a *AuthController) SignOut(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, map[string]string{})
 }
-
-// func (a *AuthController) VerifyToken(ctx echo.Context) error {
-// 	a.log.Debugf("VerifyToken")
-// 	var req requests.VerifyTokenRequest
-// 	if err := a.decodeRequest(ctx, &req); err != nil {
-// 		a.log.Debugf("Failed to validate VerifyToken: %v", err)
-// 		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Validation error: %v", err)})
-// 	}
-
-// 	mapClaims, err := a.jwtManager.VerifyToken(context.Background(), req.AccessToken)
-// 	if err != nil {
-// 		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Failed to verify token: %v", err)})
-// 	}
-
-// 	sub := mapClaims["sub"].(string)
-
-// 	return ctx.JSON(http.StatusOK, map[string]string{
-// 		"account_id": sub,
-// 	})
-// }

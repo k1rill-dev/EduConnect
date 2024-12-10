@@ -1,0 +1,197 @@
+definitions:
+  requests.RefreshTokensRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  requests.SignInRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  requests.SignOutRequest:
+    type: object
+  requests.SignUpRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+    required:
+    - email
+    - password
+    - role
+    type: object
+  response.ErrorResponse:
+    properties:
+      error:
+        type: string
+    required:
+    - error
+    type: object
+  response.RefreshTokensResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    required:
+    - access_token
+    - refresh_token
+    type: object
+  response.SignInResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    required:
+    - access_token
+    - refresh_token
+    type: object
+  response.SignOutResponse:
+    type: object
+  response.SignUpResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    required:
+    - access_token
+    - refresh_token
+    type: object
+info:
+  contact: {}
+paths:
+  /api/auth/refresh-tokens:
+    post:
+      consumes:
+      - application/json
+      description: Обновление access и refresh токенов с использованием валидного
+        refresh токена
+      parameters:
+      - description: RefreshTokens Request
+        in: body
+        name: refreshTokens
+        required: true
+        schema:
+          $ref: '#/definitions/requests.RefreshTokensRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Новые access и refresh токены
+          schema:
+            $ref: '#/definitions/response.RefreshTokensResponse'
+        "400":
+          description: Неверный refresh токен или ошибка валидации
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Обновление Access и Refresh токенов
+      tags:
+      - auth
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Авторизация пользователя по email и паролю
+      parameters:
+      - description: Данные для входа
+        in: body
+        name: signInRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.SignInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tokens
+          schema:
+            $ref: '#/definitions/response.SignInResponse'
+        "400":
+          description: Ошибка валидации или неверные учетные данные
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Вход пользователя
+      tags:
+      - auth
+  /auth/sign-out:
+    post:
+      consumes:
+      - application/json
+      description: Завершение сессии пользователя с аннулированием токенов
+      parameters:
+      - description: Данные для выхода
+        in: body
+        name: signOutRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.SignOutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Пустой ответ при успешном завершении
+          schema:
+            $ref: '#/definitions/response.SignOutResponse'
+        "400":
+          description: Ошибка валидации или неверные данные
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Выход пользователя
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Создаёт нового пользователя
+      parameters:
+      - description: Данные для регистрации
+        in: body
+        name: signUpRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.SignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tokens
+          schema:
+            $ref: '#/definitions/response.SignUpResponse'
+        "400":
+          description: Ошибка валидации
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Регистрация пользователя
+      tags:
+      - auth
+swagger: "2.0"

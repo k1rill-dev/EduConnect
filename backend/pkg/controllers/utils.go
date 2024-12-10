@@ -1,39 +1,21 @@
 package controllers
 
 import (
+	"EduConnect/internal/values"
 	"fmt"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
+	"golang.org/x/crypto/bcrypt"
 )
 
-// func (a *AuthController) verifySig(from, sigHex string, msg []byte) bool {
-// 	sig, err := hexutil.Decode(sigHex)
-// 	if err != nil {
-// 		a.log.Debugf("Failed to decode signature: %v", err)
-// 		return false
-// 	}
-
-// 	msg = accounts.TextHash(msg)
-
-// 	if len(sig) != 65 {
-// 		a.log.Debugf("Invalid signature length: %d", len(sig))
-// 		return false
-// 	}
-
-// 	if sig[crypto.RecoveryIDOffset] == 27 || sig[crypto.RecoveryIDOffset] == 28 {
-// 		sig[crypto.RecoveryIDOffset] -= 27
-// 	}
-
-// 	recovered, err := crypto.SigToPub(msg, sig)
-// 	if err != nil {
-// 		a.log.Debugf("Failed to recover public key from signature: %v", err)
-// 		return false
-// 	}
-
-// 	recoveredAddr := crypto.PubkeyToAddress(*recovered)
-// 	return strings.EqualFold(from, recoveredAddr.Hex())
-// }
+func ComparePasswords(userHashedPassword values.Password, incomingPassword string) error {
+	result := bcrypt.CompareHashAndPassword(userHashedPassword.GetPassword(), []byte(incomingPassword))
+	if result == nil {
+		return nil
+	}
+	return result
+}
 
 func (a *AuthController) decodeRequest(ctx echo.Context, i interface{}) error {
 	if err := ctx.Bind(i); err != nil {

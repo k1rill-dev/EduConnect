@@ -9,7 +9,7 @@ type AccountClaims struct {
 	Iat       int64  `json:"iat"`
 	Exp       int64  `json:"exp"`
 	Sub       string `json:"sub"`
-	WalletPub string `json:"wallet_pub"`
+	Email     string `json:"email"`
 	DeviceId  string `json:"device_id"`
 	Iss       string `json:"iss"`
 	Role      string `json:"role"`

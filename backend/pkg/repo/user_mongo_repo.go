@@ -43,12 +43,21 @@ func (m *UserMongoRepo) Update(ctx context.Context, user *model.User) error {
 }
 
 func (m *UserMongoRepo) GetById(ctx context.Context, userId string) (*model.User, error) {
-	var account model.User
-	if err := m.getUserCollection().FindOne(ctx, bson.M{"_id": userId}).Decode(&account); err != nil {
+	var user model.User
+	if err := m.getUserCollection().FindOne(ctx, bson.M{"_id": userId}).Decode(&user); err != nil {
 		return nil, err
 	}
 
-	return &account, nil
+	return &user, nil
+}
+
+func (m *UserMongoRepo) GetByEmail(ctx context.Context, email string) (*model.User, error) {
+	var user model.User
+	if err := m.getUserCollection().FindOne(ctx, bson.M{"email": email}).Decode(&user); err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
 
 func (m *UserMongoRepo) getUserCollection() *mongo.Collection {
