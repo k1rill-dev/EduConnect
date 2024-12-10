@@ -61,6 +61,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/auth/sign-in": {
+            "post": {
+                "description": "Авторизация пользователя по email и паролю",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Вход пользователя",
+                "parameters": [
+                    {
+                        "description": "Данные для входа",
+                        "name": "signInRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.SignInRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tokens",
+                        "schema": {
+                            "$ref": "#/definitions/response.SignInResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка валидации или неверные учетные данные",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/auth/sign-out": {
             "post": {
                 "description": "Завершение сессии пользователя с аннулированием токенов",
@@ -94,6 +140,52 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Ошибка валидации или неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/sign-up": {
+            "post": {
+                "description": "Создаёт нового пользователя",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Регистрация пользователя",
+                "parameters": [
+                    {
+                        "description": "Данные для регистрации",
+                        "name": "signUpRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.SignUpRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tokens",
+                        "schema": {
+                            "$ref": "#/definitions/response.SignUpResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка валидации",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -152,98 +244,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/auth/sign-in": {
-            "post": {
-                "description": "Авторизация пользователя по email и паролю",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Вход пользователя",
-                "parameters": [
-                    {
-                        "description": "Данные для входа",
-                        "name": "signInRequest",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.SignInRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Tokens",
-                        "schema": {
-                            "$ref": "#/definitions/response.SignInResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Ошибка валидации или неверные учетные данные",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Внутренняя ошибка сервера",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/auth/sign-up": {
-            "post": {
-                "description": "Создаёт нового пользователя",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Регистрация пользователя",
-                "parameters": [
-                    {
-                        "description": "Данные для регистрации",
-                        "name": "signUpRequest",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.SignUpRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Tokens",
-                        "schema": {
-                            "$ref": "#/definitions/response.SignUpResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Ошибка валидации",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Внутренняя ошибка сервера",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -281,15 +281,20 @@ const docTemplate = `{
             "required": [
                 "bio",
                 "email",
+                "firstName",
                 "password",
                 "picture",
-                "role"
+                "role",
+                "surname"
             ],
             "properties": {
                 "bio": {
                     "type": "string"
                 },
                 "email": {
+                    "type": "string"
+                },
+                "firstName": {
                     "type": "string"
                 },
                 "password": {
@@ -300,6 +305,9 @@ const docTemplate = `{
                 },
                 "role": {
                     "type": "string"
+                },
+                "surname": {
+                    "type": "string"
                 }
             }
         },
@@ -308,7 +316,9 @@ const docTemplate = `{
             "required": [
                 "bio",
                 "email",
-                "picture"
+                "firstName",
+                "picture",
+                "surname"
             ],
             "properties": {
                 "bio": {
@@ -317,7 +327,13 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
+                "firstName": {
+                    "type": "string"
+                },
                 "picture": {
+                    "type": "string"
+                },
+                "surname": {
                     "type": "string"
                 }
             }
@@ -386,7 +402,9 @@ const docTemplate = `{
             "required": [
                 "bio",
                 "email",
-                "picture"
+                "firstName",
+                "picture",
+                "surname"
             ],
             "properties": {
                 "bio": {
@@ -395,7 +413,13 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
+                "firstName": {
+                    "type": "string"
+                },
                 "picture": {
+                    "type": "string"
+                },
+                "surname": {
                     "type": "string"
                 }
             }

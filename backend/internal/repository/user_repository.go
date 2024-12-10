@@ -7,10 +7,12 @@ import (
 )
 
 type UpdateUserRequest struct {
-	Id      string        `bson:"_id"`
-	Email   *values.Email `json:"email" validate:"required,email"`
-	Picture string        `json:"picture" validate:"required"`
-	Bio     string        `json:"bio" validate:"required"`
+	Id        string        `bson:"_id"`
+	Email     *values.Email `json:"email" validate:"required,email"`
+	FirstName string        `bson:"first_name" validate:"required"`
+	Surname   string        `bson:"surname" validate:"required"`
+	Picture   string        `json:"picture" validate:"required"`
+	Bio       string        `json:"bio" validate:"required"`
 }
 
 type UserRepository interface {

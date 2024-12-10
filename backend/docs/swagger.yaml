@@ -24,18 +24,24 @@ definitions:
         type: string
       email:
         type: string
+      firstName:
+        type: string
       password:
         type: string
       picture:
         type: string
       role:
         type: string
+      surname:
+        type: string
     required:
     - bio
     - email
+    - firstName
     - password
     - picture
     - role
+    - surname
     type: object
   requests.UpdateRequest:
     properties:
@@ -43,12 +49,18 @@ definitions:
         type: string
       email:
         type: string
+      firstName:
+        type: string
       picture:
+        type: string
+      surname:
         type: string
     required:
     - bio
     - email
+    - firstName
     - picture
+    - surname
     type: object
   response.ErrorResponse:
     properties:
@@ -95,12 +107,18 @@ definitions:
         type: string
       email:
         type: string
+      firstName:
+        type: string
       picture:
+        type: string
+      surname:
         type: string
     required:
     - bio
     - email
+    - firstName
     - picture
+    - surname
     type: object
 info:
   contact: {}
@@ -136,6 +154,36 @@ paths:
       summary: Обновление Access и Refresh токенов
       tags:
       - auth
+  /api/auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Авторизация пользователя по email и паролю
+      parameters:
+      - description: Данные для входа
+        in: body
+        name: signInRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.SignInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tokens
+          schema:
+            $ref: '#/definitions/response.SignInResponse'
+        "400":
+          description: Ошибка валидации или неверные учетные данные
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Вход пользователя
+      tags:
+      - auth
   /api/auth/sign-out:
     post:
       consumes:
@@ -166,6 +214,36 @@ paths:
       summary: Выход пользователя
       tags:
       - auth
+  /api/auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Создаёт нового пользователя
+      parameters:
+      - description: Данные для регистрации
+        in: body
+        name: signUpRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.SignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tokens
+          schema:
+            $ref: '#/definitions/response.SignUpResponse'
+        "400":
+          description: Ошибка валидации
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Регистрация пользователя
+      tags:
+      - auth
   /api/auth/update-user:
     post:
       consumes:
@@ -194,66 +272,6 @@ paths:
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       summary: Обновления пользователя
-      tags:
-      - auth
-  /auth/sign-in:
-    post:
-      consumes:
-      - application/json
-      description: Авторизация пользователя по email и паролю
-      parameters:
-      - description: Данные для входа
-        in: body
-        name: signInRequest
-        required: true
-        schema:
-          $ref: '#/definitions/requests.SignInRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Tokens
-          schema:
-            $ref: '#/definitions/response.SignInResponse'
-        "400":
-          description: Ошибка валидации или неверные учетные данные
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-        "500":
-          description: Внутренняя ошибка сервера
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-      summary: Вход пользователя
-      tags:
-      - auth
-  /auth/sign-up:
-    post:
-      consumes:
-      - application/json
-      description: Создаёт нового пользователя
-      parameters:
-      - description: Данные для регистрации
-        in: body
-        name: signUpRequest
-        required: true
-        schema:
-          $ref: '#/definitions/requests.SignUpRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Tokens
-          schema:
-            $ref: '#/definitions/response.SignUpResponse'
-        "400":
-          description: Ошибка валидации
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-        "500":
-          description: Внутренняя ошибка сервера
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-      summary: Регистрация пользователя
       tags:
       - auth
 swagger: "2.0"

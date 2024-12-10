@@ -42,7 +42,7 @@ func NewAuthController(log logger.Logger, cfg *config.Config, userRepository rep
 // @Success 200 {object} response.SignUpResponse "Tokens"
 // @Failure 400 {object} response.ErrorResponse "Ошибка валидации"
 // @Failure 500 {object} response.ErrorResponse "Внутренняя ошибка сервера"
-// @Router /auth/sign-up [post]
+// @Router /api/auth/sign-up [post]
 func (a *AuthController) SignUp(ctx echo.Context) error {
 	a.log.Infof("(AuthController.SignUp)")
 	var req requests.SignUpRequest
@@ -66,7 +66,7 @@ func (a *AuthController) SignUp(ctx echo.Context) error {
 	//TODO: Добавить сохранение фотки и ниже уже ссылку пихать
 	userUuid, _ := uuid.NewV7()
 	userId := userUuid.String()
-	user := model.NewUser(userId, email, hashedPassword, req.Picture, req.Bio, time.Now(), req.Role)
+	user := model.NewUser(userId, email, hashedPassword, req.Picture, req.Bio, time.Now(), req.Role, req.FirstName, req.Surname)
 
 	deviceUuid, _ := uuid.NewV7()
 	deviceId := deviceUuid.String()
@@ -97,7 +97,7 @@ func (a *AuthController) SignUp(ctx echo.Context) error {
 // @Success 200 {object} response.SignInResponse "Tokens"
 // @Failure 400 {object} response.ErrorResponse "Ошибка валидации или неверные учетные данные"
 // @Failure 500 {object} response.ErrorResponse "Внутренняя ошибка сервера"
-// @Router /auth/sign-in [post]
+// @Router /api/auth/sign-in [post]
 func (a *AuthController) SignIn(ctx echo.Context) error {
 	a.log.Infof("(AuthController.SignIn)")
 	var req requests.SignInRequest
@@ -233,10 +233,12 @@ func (a *AuthController) UpdateUser(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": fmt.Sprintf("Internal server error: %v", err)})
 	}
 	userModel := &repository.UpdateUserRequest{
-		Id:      dbUser.Id,
-		Email:   email,
-		Picture: req.Picture,
-		Bio:     req.Bio,
+		Id:        dbUser.Id,
+		FirstName: req.FirstName,
+		Surname:   req.Surname,
+		Email:     email,
+		Picture:   req.Picture,
+		Bio:       req.Bio,
 	}
 
 	err = a.userRepository.Update(context.Background(), userModel)
@@ -245,8 +247,10 @@ func (a *AuthController) UpdateUser(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, response.UpdateResponse{
-		Email:   req.Email,
-		Picture: req.Picture,
-		Bio:     req.Bio,
+		Email:     req.Email,
+		FirstName: req.FirstName,
+		Surname:   req.Surname,
+		Picture:   req.Picture,
+		Bio:       req.Bio,
 	})
 }

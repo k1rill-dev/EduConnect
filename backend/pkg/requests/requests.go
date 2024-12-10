@@ -1,11 +1,13 @@
 package requests
 
 type SignUpRequest struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required"`
-	Picture  string `json:"picture" validate:"required"`
-	Bio      string `json:"bio" validate:"required"`
-	Role     string `json:"role" validate:"required"`
+	Email     string `json:"email" validate:"required,email"`
+	FirstName string `bson:"first_name" validate:"required"`
+	Surname   string `bson:"surname" validate:"required"`
+	Password  string `json:"password" validate:"required"`
+	Picture   string `json:"picture" validate:"required"`
+	Bio       string `json:"bio" validate:"required"`
+	Role      string `json:"role" validate:"required"`
 }
 
 type SignInRequest struct {
@@ -18,9 +20,11 @@ type RefreshTokensRequest struct {
 }
 
 type UpdateRequest struct {
-	Email   string `json:"email" validate:"required,email"`
-	Picture string `json:"picture" validate:"required"`
-	Bio     string `json:"bio" validate:"required"`
+	Email     string `json:"email" validate:"required,email"`
+	FirstName string `bson:"first_name" validate:"required"`
+	Surname   string `bson:"surname" validate:"required"`
+	Picture   string `json:"picture" validate:"required"`
+	Bio       string `json:"bio" validate:"required"`
 }
 
 type SignOutRequest struct {
