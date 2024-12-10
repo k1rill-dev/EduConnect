@@ -9,12 +9,12 @@ http:
 
 mongo:
   uri: "mongodb://user:password@mongodb:27017"
-  db: profiles
+  db: eduConnect
   connectTimeout: 10s
 
 mongoCollections:
-  profiles: profiles
-
+  users: users
+  refreshTokens: refreshTokens
 
 accessTokenExp: 3600s
 refreshTokenExp: 86400s

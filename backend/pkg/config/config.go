@@ -23,7 +23,7 @@ type Config struct {
 }
 
 type MongoCollections struct {
-	Accounts      string `mapstructure:"accounts" validate:"required"`
+	Users         string `mapstructure:"users" validate:"required"`
 	RefreshTokens string `mapstructure:"refreshTokens" validate:"required"`
 }
 
