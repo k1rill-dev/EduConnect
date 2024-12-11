@@ -62,7 +62,7 @@ func (s *S3Storage) UploadFile(base64Photo string) (string, error) {
 		return "", fmt.Errorf("ошибка сохранения файла: %w", err)
 	}
 
-	downloadURL := fmt.Sprintf("http://localhost%s/api/files/%s", s.cfg.Http.Port, fileName)
+	downloadURL := fmt.Sprintf("http://localhost%s/api/photo/%s", s.cfg.Http.Port, fileName)
 
 	fileInfo := FileInfo{
 		ID:        fileId,
