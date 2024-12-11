@@ -6,12 +6,28 @@
   <component name="ChangeListManager">
     <list default="true" id="242fffd4-1ffd-4914-bfd1-2cee8835a3eb" name="Changes" comment="added job application functionality">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/docs/docs.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docs/docs.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/docs/swagger.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docs/swagger.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/docs/swagger.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docs/swagger.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pkg/config/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pkg/config/config.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/internal/repository/job_application_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/internal/repository/job_application_repository.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/internal/repository/portfolio_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/internal/repository/portfolio_repository.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pkg/controllers/auth_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pkg/controllers/auth_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pkg/controllers/job_application_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pkg/controllers/job_application_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pkg/controllers/portfolio_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pkg/controllers/portfolio_controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pkg/middlewares/manager.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pkg/middlewares/manager.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pkg/repo/job_application_repo.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pkg/repo/job_application_repo.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pkg/repo/portfolio_repo.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pkg/repo/portfolio_repo.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pkg/requests/requests.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pkg/requests/requests.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pkg/response/responses.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pkg/response/responses.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pkg/s3/s3.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pkg/s3/s3.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/server/htttp_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/server/htttp_server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/server/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/forms/LoginForm.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/forms/LoginForm.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/forms/RegistrationForm.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/forms/RegistrationForm.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/header/Header.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/header/Header.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/pages/CreateJobPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/pages/CreateJobPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/pages/JobDetailPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/pages/JobDetailPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/pages/JobsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/pages/JobsPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/pages/ProfilePage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/pages/ProfilePage.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,8 +38,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="JavaScript File" />
-        <option value="JSX File" />
         <option value="Go File" />
+        <option value="JSX File" />
       </list>
     </option>
   </component>
@@ -98,6 +114,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="Go Build.go build EduConnect" />
+        <item itemvalue="Go Build.go build EduConnect" />
       </list>
     </recent_temporary>
   </component>
@@ -123,7 +140,8 @@
     <MESSAGE value="added first name and surname fields to model.&#10;Recreated auth controllers :))" />
     <MESSAGE value="added jobs functionality hihihihihi" />
     <MESSAGE value="added job application functionality" />
-    <option name="LAST_COMMIT_MESSAGE" value="added job application functionality" />
+    <MESSAGE value="zlodey" />
+    <option name="LAST_COMMIT_MESSAGE" value="zlodey" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

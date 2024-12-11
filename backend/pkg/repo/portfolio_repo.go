@@ -25,10 +25,10 @@ func (r *PortfolioRepositoryMongo) Create(ctx context.Context, portfolio *model.
 	return err
 }
 
-func (r *PortfolioRepositoryMongo) AddItems(ctx context.Context, portfolioId string, items []model.PortfolioItems) error {
+func (r *PortfolioRepositoryMongo) AddItems(ctx context.Context, studentId string, items []model.PortfolioItems) error {
 	_, err := r.db.UpdateOne(
 		ctx,
-		bson.M{"_id": portfolioId},
+		bson.M{"student_id": studentId},
 		bson.M{"$push": bson.M{"items": bson.M{"$each": items}}},
 	)
 	return err

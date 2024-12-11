@@ -15,6 +15,6 @@ type JobApplicationRepository interface {
 	Delete(ctx context.Context, applicationId string) error
 	UpdateStatus(ctx context.Context, applicationId string, status string) error
 
-	GetByCompany(ctx context.Context, companyId string, pagination Pagination) ([]*model.JobApplication, error)
-	GetByStudent(ctx context.Context, studentId string, pagination Pagination) ([]*model.JobApplication, error)
+	GetByCompany(ctx context.Context, companyId string) ([]*model.JobApplication, error)
+	GetByStudent(ctx context.Context, studentId string) ([]*model.JobApplication, error)
 }

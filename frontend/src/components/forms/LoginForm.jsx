@@ -1,21 +1,35 @@
 import React, { useState } from 'react';
 import { Button } from 'flowbite-react';
 import { useNavigate } from 'react-router-dom';
+import { apiClient } from '../../api';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const nav = useNavigate();
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    let sendData = {
+    const sendData = {
       email: email,
       password: password,
     };
-    // let data = await login(sendData).then(res => res);
-    // localStorage.setItem('data', JSON.stringify(data));
-    // nav('/');
+
+    try {
+      const { data } = await apiClient.post('/auth/sign-in', sendData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      localStorage.setItem('accessToken', data.access_token);
+      localStorage.setItem('refreshToken', data.refresh_token);
+      localStorage.setItem('userData', JSON.stringify(data));
+      nav('/');
+    } catch (error) {
+      console.error('Error during login:', error);
+      setErrorMessage('Неверный email или пароль');
+    }
   };
 
   return (
@@ -47,6 +61,9 @@ const LoginForm = () => {
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
             />
           </div>
+          {errorMessage && (
+            <div className="text-red-500 text-sm font-medium mt-2">{errorMessage}</div>
+          )}
           <div>
             <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg">
               Войти

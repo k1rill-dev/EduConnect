@@ -28,8 +28,8 @@ func NewMiddlewareManager(log logger.Logger, cfg *config.Config, jwtManager jwt.
 
 func (m *MiddlewareManager) CORS() echo.MiddlewareFunc {
 	corsConfig := middleware.CORSConfig{
-		AllowOrigins: []string{"*"},
-		AllowMethods: []string{echo.GET, echo.POST, echo.OPTIONS},
+		AllowOrigins: []string{"http://localhost:3000"},
+		AllowMethods: []string{echo.GET, echo.POST, echo.OPTIONS, echo.PUT},
 		AllowHeaders: []string{"Content-Type", "Authorization"},
 	}
 

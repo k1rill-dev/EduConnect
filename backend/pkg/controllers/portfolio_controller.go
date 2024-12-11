@@ -87,7 +87,7 @@ func (c *PortfolioController) CreatePortfolio(ctx echo.Context) error {
 // @Tags portfolio
 // @Accept  json
 // @Produce  json
-// @Param   portfolioId path string true "ID портфолио"
+// @Param   studentId path string true "ID студента"
 // @Param   items body []model.PortfolioItems true "Список элементов портфолио"
 // @Success 200 {object} response.SuccessResponse "Элементы добавлены"
 // @Failure 400 {object} response.ErrorResponse "Ошибка валидации"
@@ -95,27 +95,22 @@ func (c *PortfolioController) CreatePortfolio(ctx echo.Context) error {
 // @Router /api/portfolios/{portfolioId}/items [post]
 func (c *PortfolioController) AddPortfolioItems(ctx echo.Context) error {
 	c.log.Infof("(PortfolioController.AddPortfolioItems)")
-	portfolioId := ctx.Param("portfolioId")
+	_ = ctx.Param("studentId")
 	var items []model.PortfolioItems
 	if err := ctx.Bind(&items); err != nil {
 		c.log.Debugf("Failed to bind request: %v", err)
 		return ctx.JSON(http.StatusBadRequest, response.ErrorResponse{Error: "Invalid request payload"})
 	}
-
 	accountClaims := (ctx.Get("claims")).(jwt5.MapClaims)
 	accountId := accountClaims["sub"].(string)
-
-	// Проверяем роль пользователя
 	user, err := c.userRepository.GetById(context.Background(), accountId)
 	if err != nil {
 		return ctx.JSON(http.StatusUnauthorized, response.ErrorResponse{Error: "Unauthorized"})
 	}
-
 	if user.Role != "student" {
 		return ctx.JSON(http.StatusForbidden, response.ErrorResponse{Error: "Only students can add portfolio items"})
 	}
-
-	if err := c.portfolioRepository.AddItems(context.Background(), portfolioId, items); err != nil {
+	if err := c.portfolioRepository.AddItems(context.Background(), accountId, items); err != nil {
 		c.log.Error("Failed to add items to portfolio: %v", err)
 		return ctx.JSON(http.StatusInternalServerError, response.ErrorResponse{Error: "Failed to add items to portfolio"})
 	}
@@ -141,7 +136,7 @@ func (c *PortfolioController) GetPortfolioByStudent(ctx echo.Context) error {
 	portfolio, err := c.portfolioRepository.GetByStudentId(context.Background(), studentId)
 	if err != nil {
 		c.log.Error("Failed to get portfolio: %v", err)
-		return ctx.JSON(http.StatusInternalServerError, response.ErrorResponse{Error: "Failed to retrieve portfolio"})
+		return ctx.JSON(http.StatusNotFound, response.ErrorResponse{Error: err.Error()})
 	}
 	if portfolio == nil {
 		return ctx.JSON(http.StatusNotFound, response.ErrorResponse{Error: "Portfolio not found"})

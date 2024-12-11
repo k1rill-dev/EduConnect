@@ -2,13 +2,11 @@ package repo
 
 import (
 	"EduConnect/internal/model"
-	"EduConnect/internal/repository"
 	"EduConnect/pkg/config"
 	"EduConnect/pkg/logger"
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type JobApplicationRepo struct {
@@ -40,12 +38,8 @@ func (r *JobApplicationRepo) UpdateStatus(ctx context.Context, applicationId str
 	return err
 }
 
-func (r *JobApplicationRepo) GetByCompany(ctx context.Context, companyId string, pagination repository.Pagination) ([]*model.JobApplication, error) {
-	opts := options.Find().
-		SetLimit(int64(pagination.Limit)).
-		SetSkip(int64(pagination.Offset))
-
-	cursor, err := r.db.Find(ctx, bson.M{"company_id": companyId}, opts)
+func (r *JobApplicationRepo) GetByCompany(ctx context.Context, companyId string) ([]*model.JobApplication, error) {
+	cursor, err := r.db.Find(ctx, bson.M{"company_id": companyId})
 	if err != nil {
 		return nil, err
 	}
@@ -62,12 +56,8 @@ func (r *JobApplicationRepo) GetByCompany(ctx context.Context, companyId string,
 	return applications, nil
 }
 
-func (r *JobApplicationRepo) GetByStudent(ctx context.Context, studentId string, pagination repository.Pagination) ([]*model.JobApplication, error) {
-	opts := options.Find().
-		SetLimit(int64(pagination.Limit)).
-		SetSkip(int64(pagination.Offset))
-
-	cursor, err := r.db.Find(ctx, bson.M{"student_id": studentId}, opts)
+func (r *JobApplicationRepo) GetByStudent(ctx context.Context, studentId string) ([]*model.JobApplication, error) {
+	cursor, err := r.db.Find(ctx, bson.M{"student_id": studentId})
 	if err != nil {
 		return nil, err
 	}

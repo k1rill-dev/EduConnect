@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { Button, Label, TextInput, Textarea } from 'flowbite-react';
+import {apiClient} from "../../api";
 
 const CreateJobPage = () => {
   const [formData, setFormData] = useState({
@@ -7,6 +9,10 @@ const CreateJobPage = () => {
     description: '',
     location: '',
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+   const userProfile = JSON.parse(localStorage.getItem('userData')) || {};
+  const userId = userProfile.id;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -16,10 +22,27 @@ const CreateJobPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Создана вакансия:', formData);
-    alert('Вакансия успешно создана!');
+    setIsSubmitting(true);
+
+    try {
+      const response = await apiClient.post('/jobs', formData, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${userProfile.access_token}`,
+        },
+      });
+
+      console.log('Создана вакансия:', response.data);
+      alert('Вакансия успешно создана!');
+      setFormData({ title: '', description: '', location: '' });
+    } catch (error) {
+      console.error('Ошибка при создании вакансии:', error);
+      alert('Произошла ошибка при создании вакансии.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -84,8 +107,12 @@ const CreateJobPage = () => {
           </div>
 
           <div className="flex justify-end">
-            <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700">
-              Опубликовать вакансию
+            <Button
+              type="submit"
+              className="bg-indigo-600 hover:bg-indigo-700"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Отправка...' : 'Опубликовать вакансию'}
             </Button>
           </div>
         </form>

@@ -2,6 +2,15 @@ import React from 'react';
 import { Navbar, Dropdown, Button } from 'flowbite-react';
 
 const Header = () => {
+  // Проверяем, есть ли данные о пользователе в localStorage
+  const isAuthenticated = localStorage.getItem('accessToken') && localStorage.getItem('userData');
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('userData');
+    window.location.reload(); // Перезагрузка страницы для обновления состояния
+  };
+
   return (
     <Navbar fluid={true} rounded={true} className={"mr-5"}>
       <Navbar.Brand href="/">
@@ -23,24 +32,31 @@ const Header = () => {
         <Navbar.Link href="/jobs">Вакансии</Navbar.Link>
         <Navbar.Link href="/forum">Форум</Navbar.Link>
 
-        {/* Выпадающий список "Профиль" */}
-        <Dropdown
-          label="Профиль"
-          inline={true}
-          arrowIcon={true}
-          className="relative z-10"
-        >
-          <Dropdown.Item href="/profile">
-            Мой профиль
-          </Dropdown.Item>
-          <Dropdown.Item href="/settings">
-            Настройки
-          </Dropdown.Item>
-          <Dropdown.Divider />
-          <Dropdown.Item onClick={() => alert('Вышли из аккаунта')}>
-            Выйти
-          </Dropdown.Item>
-        </Dropdown>
+        {/* Если пользователь не вошел, отображаем кнопку "Войти" */}
+        {!isAuthenticated ? (
+          <Button href="/login" className="bg-indigo-600 hover:bg-indigo-700 text-white relative z-10">
+            Войти
+          </Button>
+        ) : (
+          // Если пользователь вошел, отображаем выпадающий список "Профиль"
+          <Dropdown
+            label="Профиль"
+            inline={true}
+            arrowIcon={true}
+            className="relative z-10"
+          >
+            <Dropdown.Item href="/profile">
+              Мой профиль
+            </Dropdown.Item>
+            <Dropdown.Item href="/settings">
+              Настройки
+            </Dropdown.Item>
+            <Dropdown.Divider />
+            <Dropdown.Item onClick={handleLogout}>
+              Выйти
+            </Dropdown.Item>
+          </Dropdown>
+        )}
       </Navbar.Collapse>
     </Navbar>
   );

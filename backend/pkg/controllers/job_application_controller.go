@@ -113,6 +113,64 @@ func (c *ApplicationController) UpdateApplicationStatus(ctx echo.Context) error 
 	return ctx.JSON(http.StatusOK, response.SuccessResponse{Message: "Application status updated successfully"})
 }
 
+// GetApplicationByStudentId godoc
+// @Summary Получить все отклики по студенту
+// @Description Получает все отклики по студенту
+// @Tags applications
+// @Accept  json
+// @Produce  json
+// @Success 200 {object}[]model.JobApplication "Успешно обновлено"
+// @Failure 400 {object} response.ErrorResponse "Ошибка запроса"
+// @Failure 500 {object} response.ErrorResponse "Внутренняя ошибка сервера"
+// @Router /api/applications/student [put]
+func (c *ApplicationController) GetApplicationByStudentId(ctx echo.Context) error {
+	c.log.Infof("(ApplicationController.UpdateApplicationStatus)")
+
+	accountClaims := (ctx.Get("claims")).(jwt5.MapClaims)
+	accountId := accountClaims["sub"].(string)
+
+	_, err := c.userRepository.GetById(context.Background(), accountId)
+	if err != nil {
+		return ctx.JSON(http.StatusUnauthorized, response.ErrorResponse{Error: "Unauthorized"})
+	}
+
+	data, err := c.applicationRepository.GetByStudent(context.Background(), accountId)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, response.ErrorResponse{Error: err.Error()})
+	}
+
+	return ctx.JSON(http.StatusOK, data)
+}
+
+// GetApplicationByCompanyId godoc
+// @Summary Получить все отклики по компании
+// @Description Получает все отклики по компании
+// @Tags applications
+// @Accept  json
+// @Produce  json
+// @Success 200 {object}[]model.JobApplication "Успешно обновлено"
+// @Failure 400 {object} response.ErrorResponse "Ошибка запроса"
+// @Failure 500 {object} response.ErrorResponse "Внутренняя ошибка сервера"
+// @Router /api/applications/company [put]
+func (c *ApplicationController) GetApplicationByCompanyId(ctx echo.Context) error {
+	c.log.Infof("(ApplicationController.UpdateApplicationStatus)")
+
+	accountClaims := (ctx.Get("claims")).(jwt5.MapClaims)
+	accountId := accountClaims["sub"].(string)
+
+	_, err := c.userRepository.GetById(context.Background(), accountId)
+	if err != nil {
+		return ctx.JSON(http.StatusUnauthorized, response.ErrorResponse{Error: "Unauthorized"})
+	}
+
+	data, err := c.applicationRepository.GetByCompany(context.Background(), accountId)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, response.ErrorResponse{Error: err.Error()})
+	}
+
+	return ctx.JSON(http.StatusOK, data)
+}
+
 // DeleteApplication godoc
 // @Summary Удалить отклик
 // @Description Удаляет отклик

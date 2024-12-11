@@ -15,9 +15,10 @@ import CreateCoursePage from "./components/pages/CreateCoursePage";
 import EditProfilePage from "./components/pages/EditProfilePage";
 import JobsPage from "./components/pages/JobsPage";
 import JobDetailPage from "./components/pages/JobDetailPage";
+import CoursePageForTeacher from "./components/pages/CoursePageForTeacher";
 
 function App() {
- return (
+    return (
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={(
@@ -45,7 +46,7 @@ function App() {
                         <Header/>
 
                         <div className="flex-grow">
-                            <CoursePage />
+                            <CoursePage/>
                         </div>
 
                         <Footer/>
@@ -58,6 +59,18 @@ function App() {
 
                         <div className="flex-grow">
                             <CoursePageForStudent/>
+                        </div>
+
+                        <Footer/>
+                    </div>
+                )}>
+                </Route>
+                <Route path="/courseTeacher/:courseId" element={(
+                    <div className="flex flex-col min-h-screen">
+                        <Header/>
+
+                        <div className="flex-grow">
+                            <CoursePageForTeacher/>
                         </div>
 
                         <Footer/>

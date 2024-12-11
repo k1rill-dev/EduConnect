@@ -6,11 +6,25 @@ type RefreshTokensResponse struct {
 }
 
 type SignUpResponse struct {
+	Id           string `json:"id" validate:"required"`
+	Email        string `json:"email" validate:"required,email"`
+	FirstName    string `json:"first_name" validate:"required"`
+	Surname      string `json:"surname" validate:"required"`
+	Picture      string `json:"picture" validate:"required"`
+	Bio          string `json:"bio" validate:"required"`
+	Role         string `json:"role" validate:"required"`
 	AccessToken  string `json:"access_token" validate:"required"`
 	RefreshToken string `json:"refresh_token" validate:"required"`
 }
 
 type SignInResponse struct {
+	Id           string `json:"id" validate:"required"`
+	Email        string `json:"email" validate:"required,email"`
+	FirstName    string `json:"first_name" validate:"required"`
+	Surname      string `json:"surname" validate:"required"`
+	Picture      string `json:"picture" validate:"required"`
+	Bio          string `json:"bio" validate:"required"`
+	Role         string `json:"role" validate:"required"`
 	AccessToken  string `json:"access_token" validate:"required"`
 	RefreshToken string `json:"refresh_token" validate:"required"`
 }

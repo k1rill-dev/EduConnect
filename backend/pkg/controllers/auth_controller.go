@@ -9,6 +9,7 @@ import (
 	"EduConnect/pkg/logger"
 	"EduConnect/pkg/requests"
 	"EduConnect/pkg/response"
+	"EduConnect/pkg/s3"
 	"context"
 	"fmt"
 	"net/http"
@@ -26,10 +27,11 @@ type AuthController struct {
 	validate       *validator.Validate
 	jwtManager     jwt.JwtManager
 	userRepository repository.UserRepository
+	s3Store        *s3.S3Storage
 }
 
-func NewAuthController(log logger.Logger, cfg *config.Config, userRepository repository.UserRepository, validator *validator.Validate, jwtManager jwt.JwtManager) *AuthController {
-	return &AuthController{log: log, cfg: cfg, userRepository: userRepository, validate: validator, jwtManager: jwtManager}
+func NewAuthController(log logger.Logger, cfg *config.Config, userRepository repository.UserRepository, validator *validator.Validate, jwtManager jwt.JwtManager, s3Store *s3.S3Storage) *AuthController {
+	return &AuthController{log: log, cfg: cfg, userRepository: userRepository, validate: validator, jwtManager: jwtManager, s3Store: s3Store}
 }
 
 // SignUp godoc
@@ -63,10 +65,19 @@ func (a *AuthController) SignUp(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Password error: %v", err)})
 	}
 
-	//TODO: Добавить сохранение фотки и ниже уже ссылку пихать
+	picture := ""
+	if req.Picture != "" {
+		pictureUrl, err := a.s3Store.UploadFile(req.Picture)
+		if err != nil {
+			a.log.Debugf("Failed to save photo: %v", err)
+			return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Fail to save photo: %v", err)})
+		}
+		picture = pictureUrl
+	}
+
 	userUuid, _ := uuid.NewV7()
 	userId := userUuid.String()
-	user := model.NewUser(userId, email, hashedPassword, req.Picture, req.Bio, time.Now(), req.Role, req.FirstName, req.Surname)
+	user := model.NewUser(userId, email, hashedPassword, picture, req.Bio, time.Now(), req.Role, req.FirstName, req.Surname)
 
 	deviceUuid, _ := uuid.NewV7()
 	deviceId := deviceUuid.String()
@@ -80,11 +91,18 @@ func (a *AuthController) SignUp(ctx echo.Context) error {
 		a.log.Debugf("(GenerateTokens) Failed to generate tokens: %v", err)
 		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": fmt.Sprintf("Internal server error: %v", err)})
 	}
-
-	return ctx.JSON(http.StatusOK, map[string]string{
-		"access_token":  accessToken,
-		"refresh_token": refreshToken,
-	})
+	resp := response.SignUpResponse{
+		Id:           user.Id,
+		Email:        user.Email.Email,
+		FirstName:    user.FirstName,
+		Surname:      user.Surname,
+		Picture:      user.Picture,
+		Bio:          user.Bio,
+		Role:         user.Role,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}
+	return ctx.JSON(http.StatusOK, resp)
 }
 
 // SignIn godoc
@@ -132,11 +150,18 @@ func (a *AuthController) SignIn(ctx echo.Context) error {
 		a.log.Debugf("(GenerateTokens) Failed to generate tokens: %v", err)
 		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": fmt.Sprintf("Internal server error: %v", err)})
 	}
-
-	return ctx.JSON(http.StatusOK, map[string]string{
-		"access_token":  accessToken,
-		"refresh_token": refreshToken,
-	})
+	resp := response.SignInResponse{
+		Id:           dbUser.Id,
+		Email:        dbUser.Email.Email,
+		FirstName:    dbUser.FirstName,
+		Surname:      dbUser.Surname,
+		Picture:      dbUser.Picture,
+		Bio:          dbUser.Bio,
+		Role:         dbUser.Role,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}
+	return ctx.JSON(http.StatusOK, resp)
 }
 
 // RefreshTokens godoc
@@ -149,7 +174,7 @@ func (a *AuthController) SignIn(ctx echo.Context) error {
 // @Success 200 {object} response.RefreshTokensResponse "Новые access и refresh токены"
 // @Failure 400 {object} response.ErrorResponse "Неверный refresh токен или ошибка валидации"
 // @Failure 500 {object} response.ErrorResponse "Внутренняя ошибка сервера"
-// @Router /api/auth/refresh-tokens [post]
+// @Router /api/auth/rotate [post]
 func (a *AuthController) RefreshTokens(ctx echo.Context) error {
 	a.log.Infof("(AuthController.RefreshTokens)")
 	var req requests.RefreshTokensRequest
