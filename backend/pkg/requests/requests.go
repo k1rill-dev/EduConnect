@@ -86,9 +86,27 @@ type SubmitAssignmentRequest struct {
 	Topic      string `json:"topic" form:"topic" validate:"required"`
 	Assignment string `json:"assignment" form:"assignment" validate:"required"`
 	CourseId   string `json:"course_id" form:"course_id" validate:"required"`
-	Submission string `json:"submission" form:"course_id" validate:"required"`
+	Submission string `json:"submission" form:"submission" validate:"required"`
+	TeacherId  string `json:"teacher_id" form:"teacher_id" validate:"required"`
 	// TheoryFile string `json:"theory_file" form:"theory_file" validate:"required"`
 	// Grade      string `bson:"grade" validate:"required"`
 	// SubmittedAt time.Time `bson:"submission_at"`
 	// StudentId   string    `bson:"student_id" `
+}
+
+type GetSubmissionsByTeacherIdRequest struct {
+	TeacherId string `json:"teacher_id" validate:"required"`
+}
+
+type GetSubmissionById struct {
+	Id string `json:"id" validate:"required"`
+}
+
+type EnrollStudentRequest struct {
+	CourseId string `json:"course_id" validate:"required"`
+}
+
+type EvaluateStudentRequest struct {
+	SubmissionId string `json:"submission_id" validate:"required"`
+	Grade        string `json:"grade" validate:"required,gte=2,lte=5"`
 }

@@ -28,6 +28,7 @@ type MongoCollections struct {
 	S3            string `mapstructure:"s3" validate:"required"`
 	Courses       string `mapstructure:"courses" validate:"required"`
 	Submissions   string `mapstructure:"submissions" validate:"required"`
+	Enrollments   string `mapstructure:"enrollments" validate:"required"`
 }
 
 type Http struct {

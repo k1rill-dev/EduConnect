@@ -18,6 +18,7 @@ mongoCollections:
   s3: s3
   courses: courses
   submissions: submissions
+  enrollments: enrollments
 
 accessTokenExp: 3600s
 refreshTokenExp: 86400s

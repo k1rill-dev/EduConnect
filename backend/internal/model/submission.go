@@ -7,6 +7,7 @@ type Submission struct {
 	Topic       string    `bson:"topic"`
 	Assignment  string    `bson:"assignment"`
 	CourseId    string    `bson:"course_id"`
+	TeacherId   string    `bson:"teacher_id"`
 	StudentId   string    `bson:"student_id"`
 	Submission  string    `bson:"submission"`
 	Grade       string    `bson:"grade"`

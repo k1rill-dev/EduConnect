@@ -74,6 +74,74 @@ func (c *CourseMongoRepo) SubmitAssignment(ctx context.Context, submission *mode
 	return nil
 }
 
+func (c *CourseMongoRepo) GetSubmissionsByStudentId(ctx context.Context, studentId string) ([]*model.Submission, error) {
+	submissions := []*model.Submission{}
+	cursor, err := c.getSubmissionCollection().Find(ctx, bson.M{"student_id": studentId})
+	if err != nil {
+		return nil, err
+	}
+
+	for cursor.Next(ctx) {
+		var submission model.Submission
+		if err := cursor.Decode(&submission); err != nil {
+			return nil, err
+		}
+		submissions = append(submissions, &submission)
+	}
+
+	return submissions, nil
+}
+
+func (c *CourseMongoRepo) GetSubmissionsByTeacherId(ctx context.Context, teacherId string) ([]*model.Submission, error) {
+	submissions := []*model.Submission{}
+	cursor, err := c.getSubmissionCollection().Find(ctx, bson.M{"teacher_id": teacherId})
+	if err != nil {
+		return nil, err
+	}
+
+	for cursor.Next(ctx) {
+		var submission model.Submission
+		if err := cursor.Decode(&submission); err != nil {
+			return nil, err
+		}
+		submissions = append(submissions, &submission)
+	}
+
+	return submissions, nil
+}
+
+func (c *CourseMongoRepo) EnrollCourse(ctx context.Context, enrollment *model.CourseEnrollment) error {
+	_, err := c.getEnrollmentCollection().InsertOne(ctx, enrollment, &options.InsertOneOptions{})
+	if err != nil && !strings.Contains(err.Error(), "no documents") {
+		c.log.Debugf("(CourseMongoRepo) error: %v", err)
+		return err
+	}
+	return nil
+}
+
+func (c *CourseMongoRepo) UpdateSubmission(ctx context.Context, submission *model.Submission) error {
+	_, err := c.getSubmissionCollection().UpdateOne(ctx, bson.M{"_id": submission.Id}, submission)
+	if err != nil && !strings.Contains(err.Error(), "no documents") {
+		c.log.Debugf("(CourseMongoRepo) error: %v", err)
+		return err
+	}
+	return nil
+}
+
+func (c *CourseMongoRepo) GetSubmissionById(ctx context.Context, submissionId string) (*model.Submission, error) {
+	var course model.Submission
+	err := c.getCourseCollection().FindOne(ctx, bson.M{"_id": submissionId}).Decode(&course)
+	if err != nil {
+		c.log.Debugf("(CourseMongoRepo) error: %v", err)
+		return nil, err
+	}
+	return &course, nil
+}
+
+func (c *CourseMongoRepo) getEnrollmentCollection() *mongo.Collection {
+	return c.mongoClient.Database(c.cfg.Mongo.Db).Collection(c.cfg.MongoCollections.Enrollments)
+}
+
 func (c *CourseMongoRepo) getCourseCollection() *mongo.Collection {
 	return c.mongoClient.Database(c.cfg.Mongo.Db).Collection(c.cfg.MongoCollections.Courses)
 }
