@@ -763,9 +763,543 @@
                     }
                 }
             }
+        },
+        "/assignments/submit": {
+            "post": {
+                "description": "Этот метод позволяет студентам отправлять задания для проверки.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assignments"
+                ],
+                "summary": "Отправить задание",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Тема задания",
+                        "name": "topic",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Название задания",
+                        "name": "assignment",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID курса",
+                        "name": "course_id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID преподавателя",
+                        "name": "teacher_id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Файл задания",
+                        "name": "submission",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Задание успешно отправлено",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка валидации",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сохранения задания",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/courses": {
+            "get": {
+                "description": "Возвращает список всех доступных курсов.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Получить все курсы",
+                "responses": {
+                    "200": {
+                        "description": "Список курсов",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка получения курсов",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Этот метод позволяет создавать курсы с заданными параметрами.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Создание нового курса",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Название курса",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Описание курса",
+                        "name": "description",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID преподавателя",
+                        "name": "teacher_id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Дата начала курса (формат RFC3339)",
+                        "name": "start_date",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Дата окончания курса (формат RFC3339)",
+                        "name": "end_date",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "JSON-строка с темами курса",
+                        "name": "topics",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Курс успешно создан",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка валидации или отсутствуют обязательные поля",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сохранения курса",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/courses/enroll": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Allows a student to enroll in a course.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Enroll in a course",
+                "parameters": [
+                    {
+                        "description": "Enrollment data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.EnrollStudentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/courses/student/submissions": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieves all submissions for a given student based on their account ID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Get submissions by student ID",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/courses/{id}": {
+            "get": {
+                "description": "Возвращает курс, используя уникальный идентификатор.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Получить курс по ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID курса",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Данные курса",
+                        "schema": {
+                            "$ref": "#/definitions/model.Course"
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка валидации",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка получения курса",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/submissions/evaluate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Allows a teacher to grade a student's submission.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Submissions"
+                ],
+                "summary": "Evaluate a student submission",
+                "parameters": [
+                    {
+                        "description": "Evaluation data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.EvaluateStudentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/submissions/teacher/{teacher_id}": {
+            "get": {
+                "description": "Возвращает список заданий, отправленных преподавателю.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Submissions"
+                ],
+                "summary": "Получить задания по ID преподавателя",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID преподавателя",
+                        "name": "teacher_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Список заданий",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка валидации",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка получения заданий",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/submissions/{id}": {
+            "get": {
+                "description": "Возвращает задание, используя уникальный идентификатор.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Submissions"
+                ],
+                "summary": "Получить задание по ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID задания",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Данные задания",
+                        "schema": {
+                            "$ref": "#/definitions/model.Submission"
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка валидации",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка получения задания",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "model.Assignment": {
+            "type": "object",
+            "properties": {
+                "additionalInfo": {
+                    "type": "string"
+                },
+                "theoryFile": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Course": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "endDate": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "teacherId": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "topics": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Topic"
+                    }
+                }
+            }
+        },
         "model.Job": {
             "type": "object",
             "properties": {
@@ -816,6 +1350,52 @@
                     "type": "string"
                 },
                 "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Submission": {
+            "type": "object",
+            "properties": {
+                "assignment": {
+                    "type": "string"
+                },
+                "courseId": {
+                    "type": "string"
+                },
+                "grade": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "studentId": {
+                    "type": "string"
+                },
+                "submission": {
+                    "type": "string"
+                },
+                "submittedAt": {
+                    "type": "string"
+                },
+                "teacherId": {
+                    "type": "string"
+                },
+                "topic": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Topic": {
+            "type": "object",
+            "properties": {
+                "assignments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Assignment"
+                    }
+                },
+                "title": {
                     "type": "string"
                 }
             }
@@ -878,6 +1458,34 @@
                 }
             }
         },
+        "requests.EnrollStudentRequest": {
+            "type": "object",
+            "required": [
+                "course_id"
+            ],
+            "properties": {
+                "course_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.EvaluateStudentRequest": {
+            "type": "object",
+            "required": [
+                "grade",
+                "submission_id"
+            ],
+            "properties": {
+                "grade": {
+                    "type": "string",
+                    "maxLength": 5,
+                    "minLength": 2
+                },
+                "submission_id": {
+                    "type": "string"
+                }
+            }
+        },
         "requests.RefreshTokensRequest": {
             "type": "object",
             "required": [
@@ -912,7 +1520,7 @@
             "required": [
                 "bio",
                 "email",
-                "firstName",
+                "first_name",
                 "password",
                 "picture",
                 "role",
@@ -925,7 +1533,7 @@
                 "email": {
                     "type": "string"
                 },
-                "firstName": {
+                "first_name": {
                     "type": "string"
                 },
                 "password": {
