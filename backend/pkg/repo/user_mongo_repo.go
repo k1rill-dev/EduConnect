@@ -2,6 +2,7 @@ package repo
 
 import (
 	"EduConnect/internal/model"
+	"EduConnect/internal/repository"
 	"EduConnect/internal/values"
 	"EduConnect/pkg/config"
 	"EduConnect/pkg/logger"
@@ -31,7 +32,7 @@ func (m *UserMongoRepo) Create(ctx context.Context, user *model.User) error {
 	return nil
 }
 
-func (m *UserMongoRepo) Update(ctx context.Context, user *model.User) error {
+func (m *UserMongoRepo) Update(ctx context.Context, user *repository.UpdateUserRequest) error {
 	ops := options.FindOneAndUpdate()
 	ops.SetReturnDocument(options.After)
 	ops.SetUpsert(false)

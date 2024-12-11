@@ -19,9 +19,34 @@ func (s *server) mapRoutes() {
 	s.echo.POST("api/auth/sign-in", s.authController.SignIn)
 	s.echo.POST("api/auth/sign-out", s.authController.SignOut)
 
+	updateUser := s.echo.Group("api/auth/update-user", s.middleware.AuthMiddleware)
+
+	updateUser.POST("", s.authController.UpdateUser)
+
+	signOut := s.echo.Group("api/auth/sign-out", s.middleware.AuthMiddleware)
+	signOut.POST("", s.authController.SignOut)
+
 	s.echo.POST("api/course/", s.courseController.CreateCourse)
 
 	s.echo.Static("api/files/", "storage")
+
+	applications := s.echo.Group("/api/applications", s.middleware.AuthMiddleware)
+	applications.POST("", s.jobApplicationController.CreateApplication)
+	applications.PUT("/:applicationId/status", s.jobApplicationController.UpdateApplicationStatus)
+	applications.DELETE("/:applicationId", s.jobApplicationController.DeleteApplication)
+
+	s.echo.GET("/api/jobs/:jobId", s.jobController.GetJobById)
+	s.echo.GET("/api/jobs/search", s.jobController.SearchJobs)
+	s.echo.POST("/api/jobs/filter", s.jobController.GetJobsByFilters)
+
+	jobsWithAuth := s.echo.Group("/api/jobs", s.middleware.AuthMiddleware)
+	jobsWithAuth.POST("", s.jobController.CreateJob)
+	jobsWithAuth.PUT("/:jobId", s.jobController.UpdateJob)
+
+	portfolios := s.echo.Group("/api/portfolios")
+	portfolios.POST("", s.portfolioController.CreatePortfolio, s.middleware.AuthMiddleware)
+	portfolios.POST("/:portfolioId/items", s.portfolioController.AddPortfolioItems, s.middleware.AuthMiddleware)
+	portfolios.GET("/student/:studentId", s.portfolioController.GetPortfolioByStudent)
 
 	s.echo.GET("/swagger/*", echoSwagger.WrapHandler)
 }
