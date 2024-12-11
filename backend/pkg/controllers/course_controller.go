@@ -40,6 +40,22 @@ func (c *CourseController) generateAssignmentFilename() string {
 	return uuid.String()
 }
 
+// CreateCourse создает новый курс.
+// @Summary Создание нового курса
+// @Description Этот метод позволяет создавать курсы с заданными параметрами.
+// @Tags Courses
+// @Accept json
+// @Produce json
+// @Param title formData string true "Название курса"
+// @Param description formData string false "Описание курса"
+// @Param teacher_id formData string true "ID преподавателя"
+// @Param start_date formData string true "Дата начала курса (формат RFC3339)"
+// @Param end_date formData string true "Дата окончания курса (формат RFC3339)"
+// @Param topics formData string true "JSON-строка с темами курса"
+// @Success 200 {object} map[string]interface{} "Курс успешно создан"
+// @Failure 400 {object} map[string]string "Ошибка валидации или отсутствуют обязательные поля"
+// @Failure 500 {object} map[string]string "Ошибка сохранения курса"
+// @Router /courses [post]
 func (c *CourseController) CreateCourse(ctx echo.Context) error {
 	title := ctx.FormValue("title")
 	description := ctx.FormValue("description")
@@ -143,6 +159,14 @@ func (c *CourseController) CreateCourse(ctx echo.Context) error {
 	})
 }
 
+// GetCourses возвращает список всех курсов.
+// @Summary Получить все курсы
+// @Description Возвращает список всех доступных курсов.
+// @Tags Courses
+// @Produce json
+// @Success 200 {object} map[string]interface{} "Список курсов"
+// @Failure 500 {object} map[string]string "Ошибка получения курсов"
+// @Router /courses [get]
 func (c *CourseController) GetCourses(ctx echo.Context) error {
 	courses, err := c.courseRepo.List(context.Background())
 	if err != nil {
@@ -156,6 +180,17 @@ func (c *CourseController) GetCourses(ctx echo.Context) error {
 	})
 }
 
+// GetCourseById возвращает курс по ID.
+// @Summary Получить курс по ID
+// @Description Возвращает курс, используя уникальный идентификатор.
+// @Tags Courses
+// @Accept json
+// @Produce json
+// @Param id path string true "ID курса"
+// @Success 200 {object} model.Course "Данные курса"
+// @Failure 400 {object} map[string]string "Ошибка валидации"
+// @Failure 500 {object} map[string]string "Ошибка получения курса"
+// @Router /courses/{id} [get]
 func (c *CourseController) GetCourseById(ctx echo.Context) error {
 	var req requests.GetCourseByIdRequest
 	if err := c.decodeRequest(ctx, &req); err != nil {
@@ -170,6 +205,21 @@ func (c *CourseController) GetCourseById(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, course)
 }
 
+// SubmitAssignment отправляет задание.
+// @Summary Отправить задание
+// @Description Этот метод позволяет студентам отправлять задания для проверки.
+// @Tags Assignments
+// @Accept multipart/form-data
+// @Produce json
+// @Param topic formData string true "Тема задания"
+// @Param assignment formData string true "Название задания"
+// @Param course_id formData string true "ID курса"
+// @Param teacher_id formData string true "ID преподавателя"
+// @Param submission formData file true "Файл задания"
+// @Success 200 {object} map[string]string "Задание успешно отправлено"
+// @Failure 400 {object} map[string]string "Ошибка валидации"
+// @Failure 500 {object} map[string]string "Ошибка сохранения задания"
+// @Router /assignments/submit [post]
 func (c *CourseController) SubmitAssignment(ctx echo.Context) error {
 	// var req requests.SubmitAssignmentRequest
 	// if err := c.decodeRequest(ctx, &req); err != nil {
@@ -232,6 +282,17 @@ func (c *CourseController) SubmitAssignment(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, map[string]string{})
 }
 
+// GetSubmissionsByTeacherId возвращает задания по ID преподавателя.
+// @Summary Получить задания по ID преподавателя
+// @Description Возвращает список заданий, отправленных преподавателю.
+// @Tags Submissions
+// @Accept json
+// @Produce json
+// @Param teacher_id path string true "ID преподавателя"
+// @Success 200 {object} map[string]interface{} "Список заданий"
+// @Failure 400 {object} map[string]string "Ошибка валидации"
+// @Failure 500 {object} map[string]string "Ошибка получения заданий"
+// @Router /submissions/teacher/{teacher_id} [get]
 func (c *CourseController) GetSubmissionsByTeacherId(ctx echo.Context) error {
 	var req requests.GetSubmissionsByTeacherIdRequest
 	if err := c.decodeRequest(ctx, &req); err != nil {
@@ -251,6 +312,17 @@ func (c *CourseController) GetSubmissionsByTeacherId(ctx echo.Context) error {
 	})
 }
 
+// GetSubmissionById возвращает задание по ID.
+// @Summary Получить задание по ID
+// @Description Возвращает задание, используя уникальный идентификатор.
+// @Tags Submissions
+// @Accept json
+// @Produce json
+// @Param id path string true "ID задания"
+// @Success 200 {object} model.Submission "Данные задания"
+// @Failure 400 {object} map[string]string "Ошибка валидации"
+// @Failure 500 {object} map[string]string "Ошибка получения задания"
+// @Router /submissions/{id} [get]
 func (c *CourseController) GetSubmissionById(ctx echo.Context) error {
 	var req requests.GetSubmissionById
 	if err := c.decodeRequest(ctx, &req); err != nil {
@@ -270,6 +342,16 @@ func (c *CourseController) GetSubmissionById(ctx echo.Context) error {
 	})
 }
 
+// GetByStudentId
+// @Summary Get submissions by student ID
+// @Description Retrieves all submissions for a given student based on their account ID.
+// @Tags Courses
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Router /courses/student/submissions [get]
 func (c *CourseController) GetByStudentId(ctx echo.Context) error {
 	accountClaims := (ctx.Get("claims")).(jwt.MapClaims)
 	accountId := accountClaims["sub"].(string)
@@ -345,6 +427,17 @@ func (a *CourseController) decodeRequest(ctx echo.Context, i interface{}) error 
 	return nil
 }
 
+// EnrollCourse
+// @Summary Enroll in a course
+// @Description Allows a student to enroll in a course.
+// @Tags Courses
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param request body requests.EnrollStudentRequest true "Enrollment data"
+// @Success 200
+// @Failure 400 {object} map[string]string
+// @Router /courses/enroll [post]
 func (c *CourseController) EnrollCourse(ctx echo.Context) error {
 	accountClaims := (ctx.Get("claims")).(jwt.MapClaims)
 	accountId := accountClaims["sub"].(string)
@@ -383,6 +476,18 @@ func (c *CourseController) EnrollCourse(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, nil)
 }
 
+// EvaluateStudent
+// @Summary Evaluate a student submission
+// @Description Allows a teacher to grade a student's submission.
+// @Tags Submissions
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param request body requests.EvaluateStudentRequest true "Evaluation data"
+// @Success 200
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /submissions/evaluate [post]
 func (c *CourseController) EvaluateStudent(ctx echo.Context) error {
 	accountClaims := (ctx.Get("claims")).(jwt.MapClaims)
 	accountId := accountClaims["sub"].(string)
