@@ -45,6 +45,13 @@ func (c *CourseController) CreateCourse(ctx echo.Context) error {
 	startDate, _ := time.Parse(layout, ctx.FormValue("start_date"))
 	endDate, _ := time.Parse(layout, ctx.FormValue("end_date"))
 
+	topicsStr := ctx.FormValue("topics")
+	if topicsStr == "" {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Поле topics не передано",
+		})
+	}
+
 	createCourseReq := &requests.CreateCourseRequest{
 		Title:       title,
 		Description: description,
@@ -59,23 +66,23 @@ func (c *CourseController) CreateCourse(ctx echo.Context) error {
 		})
 	}
 
-	topicsFile, err := ctx.FormFile("topics")
-	if err != nil {
-		return ctx.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Не удалось получить файл с темами",
-		})
-	}
+	// topicsFile, err := ctx.FormFile("topics")
+	// if err != nil {
+	// 	return ctx.JSON(http.StatusBadRequest, map[string]string{
+	// 		"error": "Не удалось получить файл с темами",
+	// 	})
+	// }
 
-	topicsData, err := topicsFile.Open()
-	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, map[string]string{
-			"error": "Ошибка открытия файла с темами",
-		})
-	}
-	defer topicsData.Close()
+	// topicsData, err := topicsFile.Open()
+	// if err != nil {
+	// 	return ctx.JSON(http.StatusInternalServerError, map[string]string{
+	// 		"error": "Ошибка открытия файла с темами",
+	// 	})
+	// }
+	// defer topicsData.Close()
 
 	var topicsReq []requests.TopicRequest
-	if err := json.NewDecoder(topicsData).Decode(&topicsReq); err != nil {
+	if err := json.Unmarshal([]byte(topicsStr), &topicsReq); err != nil {
 		return ctx.JSON(http.StatusBadRequest, map[string]string{
 			"error": "Ошибка парсинга JSON с темами",
 		})
@@ -148,7 +155,7 @@ func (c *CourseController) savePdfFile(ctx echo.Context, theoryFile string) (str
 	}
 	filename := c.generateAssignmentFilename()
 	filePath := fmt.Sprintf("%s%s.pdf", pathToPdf, filename)
-	fileUrl := fmt.Sprintf("http://localhost%s/api/%s", c.cfg.Http.Port, filePath)
+	fileUrl := fmt.Sprintf("http://localhost%s/api/file/%s.pdf", c.cfg.Http.Port, filename)
 	src, err := pdfFile.Open()
 	if err != nil {
 		c.log.Error("Error by open pdf: ", err)

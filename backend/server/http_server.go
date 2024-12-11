@@ -15,6 +15,7 @@ func (s *server) runHttpServer() error {
 }
 
 func (s *server) mapRoutes() {
+	s.echo.Use(s.middleware.CORS())
 	s.echo.POST("api/auth/sign-up", s.authController.SignUp)
 	s.echo.POST("api/auth/sign-in", s.authController.SignIn)
 	s.echo.POST("api/auth/sign-out", s.authController.SignOut)
@@ -28,7 +29,8 @@ func (s *server) mapRoutes() {
 
 	s.echo.POST("api/course/", s.courseController.CreateCourse)
 
-	s.echo.Static("api/files/", "storage")
+	s.echo.Static("api/photo/", "storage/photo")
+	s.echo.Static("api/file/", "storage/assignments")
 
 	applications := s.echo.Group("/api/applications", s.middleware.AuthMiddleware)
 	applications.POST("", s.jobApplicationController.CreateApplication)

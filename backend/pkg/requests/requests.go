@@ -7,8 +7,8 @@ import (
 
 type SignUpRequest struct {
 	Email     string `json:"email" validate:"required,email"`
-	FirstName string `bson:"first_name" validate:"required"`
-	Surname   string `bson:"surname" validate:"required"`
+	FirstName string `json:"first_name" validate:"required"`
+	Surname   string `json:"surname" validate:"required"`
 	Password  string `json:"password" validate:"required"`
 	Picture   string `json:"picture" validate:"required"`
 	Bio       string `json:"bio" validate:"required"`
