@@ -64,10 +64,6 @@ func (password *Password) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (password *Password) ToString() string {
-	return fmt.Sprintf("%s", password.Password)
-}
-
 func (password *Password) GetPassword() []byte {
 	return password.Password
 }

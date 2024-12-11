@@ -5,9 +5,13 @@ import (
 	"time"
 )
 
+type RoleType string
+
 type User struct {
 	Id        string           `bson:"_id"`
 	Email     *values.Email    `bson:"email"`
+	FirstName string           `bson:"first_name"`
+	Surname   string           `bson:"surname"`
 	Password  *values.Password `bson:"password"`
 	Picture   string           `bson:"picture"`
 	Bio       string           `bson:"bio"`
@@ -15,8 +19,9 @@ type User struct {
 	Role      string           `bson:"role"`
 }
 
-func NewUser(id string, email *values.Email, password *values.Password, picture string, bio string, createdAt time.Time, role string) *User {
-	return &User{Id: id, Email: email, Password: password, Picture: picture, Bio: bio, CreatedAt: createdAt, Role: role}
+func NewUser(id string, email *values.Email, password *values.Password,
+	picture string, bio string, createdAt time.Time, role string, firstName string, surname string) *User {
+	return &User{Id: id, Email: email, FirstName: firstName, Surname: surname, Password: password, Picture: picture, Bio: bio, CreatedAt: createdAt, Role: role}
 }
 
 // func (u *User) ToUserDb() *UserDB {

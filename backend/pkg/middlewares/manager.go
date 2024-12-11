@@ -72,7 +72,6 @@ func (m *MiddlewareManager) AuthMiddleware(next echo.HandlerFunc) echo.HandlerFu
 
 		c.Set("claims", claims)
 		c.Set("token", accessToken)
-
 		return next(c)
 	}
 }
