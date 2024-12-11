@@ -16,6 +16,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofrs/uuid"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
@@ -26,10 +27,11 @@ type CourseController struct {
 	cfg        *config.Config
 	validate   *validator.Validate
 	courseRepo repository.CourseRepository
+	userRepo   repository.UserRepository
 }
 
-func NewCourseController(log logger.Logger, cfg *config.Config, validate *validator.Validate, courseRepo repository.CourseRepository) *CourseController {
-	return &CourseController{log: log, cfg: cfg, validate: validate, courseRepo: courseRepo}
+func NewCourseController(log logger.Logger, cfg *config.Config, validate *validator.Validate, courseRepo repository.CourseRepository, userRepo repository.UserRepository) *CourseController {
+	return &CourseController{log: log, cfg: cfg, validate: validate, courseRepo: courseRepo, userRepo: userRepo}
 }
 
 func (c *CourseController) generateAssignmentFilename() string {
@@ -140,6 +142,73 @@ func (c *CourseController) CreateCourse(ctx echo.Context) error {
 	})
 }
 
+func (c *CourseController) GetCourses(ctx echo.Context) error {
+	courses, err := c.courseRepo.List(context.Background())
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, map[string]string{
+			"error": "course",
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"courses": courses,
+	})
+}
+
+func (c *CourseController) GetCourseById(ctx echo.Context) error {
+	var req requests.GetCourseByIdRequest
+	if err := c.decodeRequest(ctx, &req); err != nil {
+		c.log.Debugf("Failed to decode request GetCourseById: %v", err)
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Validation error: %v", err)})
+	}
+	course, err := c.courseRepo.GetById(context.Background(), req.Id)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Error by get course by id: %v", err)})
+	}
+
+	return ctx.JSON(http.StatusOK, course)
+}
+
+func (c *CourseController) SubmitAssignment(ctx echo.Context) error {
+	var req requests.SubmitAssignmentRequest
+	if err := c.decodeRequest(ctx, &req); err != nil {
+		c.log.Debugf("Failed to decode request GetCourseById: %v", err)
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Validation error: %v", err)})
+	}
+
+	accountClaims := (ctx.Get("claims")).(jwt.MapClaims)
+	accountId := accountClaims["sub"].(string)
+
+	account, err := c.userRepo.GetById(context.Background(), accountId)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Validation error: %v", err)})
+	}
+
+	if account.Role != "student" {
+		return ctx.JSON(http.StatusNetworkAuthenticationRequired, "Role is not student")
+	}
+
+	submissionUuid, _ := uuid.NewV7()
+	submissionId := submissionUuid.String()
+	submission := &model.Submission{
+		Id:          submissionId,
+		Topic:       req.Topic,
+		Assignment:  req.Assignment,
+		SubmittedAt: time.Now(),
+		CourseId:    req.CourseId,
+		StudentId:   accountId,
+	}
+
+	if err := c.courseRepo.SubmitAssignment(context.Background(), submission); err != nil {
+		c.log.Error("Error by save submit assignment: ", err)
+		return ctx.JSON(http.StatusInternalServerError, map[string]string{
+			"error": "Error by save submit assignment",
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, map[string]string{})
+}
+
 func (c *CourseController) savePdfFile(ctx echo.Context, theoryFile string) (string, error) {
 	if _, err := os.Stat(pathToPdf); os.IsNotExist(err) {
 		if err := os.MkdirAll(pathToPdf, os.ModePerm); err != nil {
@@ -176,4 +245,16 @@ func (c *CourseController) savePdfFile(ctx echo.Context, theoryFile string) (str
 	}
 
 	return fileUrl, nil
+}
+
+func (a *CourseController) decodeRequest(ctx echo.Context, i interface{}) error {
+	if err := ctx.Bind(i); err != nil {
+		return fmt.Errorf("invalid request")
+	}
+
+	if err := a.validate.Struct(i); err != nil {
+		return err.(validator.ValidationErrors)
+	}
+
+	return nil
 }

@@ -79,7 +79,7 @@ func (s *server) Run() error {
 	s.jobApplicationController = controllers.NewApplicationController(s.log, s.cfg, jobApplicationRepo, validate, jwtManager, userRepo)
 	s.portfolioController = controllers.NewPortfolioController(s.log, s.cfg, portfolioRepo, validate, jwtManager, userRepo)
 	courseRepository := repo.NewCourseMongoRepo(s.log, s.cfg, s.mongoClient)
-	courseController := controllers.NewCourseController(s.log, s.cfg, validate, courseRepository)
+	courseController := controllers.NewCourseController(s.log, s.cfg, validate, courseRepository, userRepo)
 	s.courseController = courseController
 
 	go func() {
