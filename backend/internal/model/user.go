@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+type RoleType string
+
 type User struct {
 	Id        string           `bson:"_id"`
 	Email     *values.Email    `bson:"email"`
