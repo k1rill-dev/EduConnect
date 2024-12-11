@@ -27,9 +27,9 @@ func (s *server) mapRoutes() {
 	signOut := s.echo.Group("api/auth/sign-out", s.middleware.AuthMiddleware)
 	signOut.POST("", s.authController.SignOut)
 
-	courseGroup := s.echo.Group("api/course", s.middleware.AuthMiddleware)
-	courseGroup.POST("/", s.courseController.CreateCourse)
-	courseGroup.POST("/:id/submit-assignment", s.courseController.SubmitAssignment)
+	// courseGroup := s.echo.Group("api/course", s.middleware.AuthMiddleware)
+	s.echo.POST("api/course/", s.courseController.CreateCourse, s.middleware.AuthMiddleware)
+	s.echo.POST("api/course/submit-assignment", s.courseController.SubmitAssignment, s.middleware.AuthMiddleware)
 
 	s.echo.GET("api/course/", s.courseController.GetCourses)
 
