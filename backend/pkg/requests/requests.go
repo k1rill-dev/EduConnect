@@ -36,6 +36,10 @@ type CreateCourseRequest struct {
 	Topics      []TopicRequest `json:"topics" form:"topics"`
 }
 
+type GetCourseByIdRequest struct {
+	Id string `json:"_id" validate:"required"`
+}
+
 type TopicRequest struct {
 	Title       string              `json:"title" form:"title" validate:"required"`
 	Assignments []AssignmentRequest `json:"assignments" form:"assignments"`
@@ -76,4 +80,13 @@ type CreateJobApplication struct {
 type CreatePortfolioRequest struct {
 	StudentId string                 `bson:"student_id"`
 	Items     []model.PortfolioItems `bson:"items"`
+}
+
+type SubmitAssignmentRequest struct {
+	Topic      string `json:"topic" validate:"required"`
+	Assignment string `bson:"assignment" validate:"required"`
+	CourseId   string `bson:"course_id" validate:"required"`
+	// Grade      string `bson:"grade" validate:"required"`
+	// SubmittedAt time.Time `bson:"submission_at"`
+	// StudentId   string    `bson:"student_id" `
 }
