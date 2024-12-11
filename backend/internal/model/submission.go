@@ -8,6 +8,7 @@ type Submission struct {
 	Assignment  string    `bson:"assignment"`
 	CourseId    string    `bson:"course_id"`
 	StudentId   string    `bson:"student_id"`
+	Submission  string    `bson:"submission"`
 	Grade       string    `bson:"grade"`
 	SubmittedAt time.Time `bson:"submission_at"`
 }

@@ -29,7 +29,7 @@ func (s *server) mapRoutes() {
 
 	// courseGroup := s.echo.Group("api/course", s.middleware.AuthMiddleware)
 	s.echo.POST("api/course/", s.courseController.CreateCourse, s.middleware.AuthMiddleware)
-	s.echo.POST("/submit-assignment", s.courseController.SubmitAssignment, s.middleware.AuthMiddleware)
+	s.echo.POST("api/course/submit-assignment", s.courseController.SubmitAssignment, s.middleware.AuthMiddleware)
 
 	s.echo.GET("api/course/", s.courseController.GetCourses)
 

@@ -12,6 +12,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -188,10 +189,12 @@ func (c *CourseController) SubmitAssignment(ctx echo.Context) error {
 	}
 
 	topic := ctx.FormValue("topic")
+	assignment := ctx.FormValue("assignment")
 	courseId := ctx.FormValue("course_id")
 
-	filePath, err := c.savePdfFile(ctx, ctx.FormValue("assignment"))
+	filePath, err := c.saveFile(ctx, "submission")
 	if err != nil {
+		c.log.Debugf("Error: %v", err)
 		return ctx.JSON(http.StatusBadRequest, map[string]string{
 			"error": "Error by save pdf",
 		})
@@ -199,7 +202,8 @@ func (c *CourseController) SubmitAssignment(ctx echo.Context) error {
 
 	req := requests.SubmitAssignmentRequest{
 		Topic:      topic,
-		Assignment: filePath,
+		Assignment: assignment,
+		Submission: filePath,
 		CourseId:   courseId,
 	}
 
@@ -209,6 +213,7 @@ func (c *CourseController) SubmitAssignment(ctx echo.Context) error {
 		Id:          submissionId,
 		Topic:       req.Topic,
 		Assignment:  req.Assignment,
+		Submission:  req.Submission,
 		SubmittedAt: time.Now(),
 		CourseId:    req.CourseId,
 		StudentId:   accountId,
@@ -272,4 +277,58 @@ func (a *CourseController) decodeRequest(ctx echo.Context, i interface{}) error 
 	}
 
 	return nil
+}
+
+func (c *CourseController) saveFile(ctx echo.Context, formKey string) (string, error) {
+	if _, err := os.Stat(pathToPdf); os.IsNotExist(err) {
+		if err := os.MkdirAll(pathToPdf, os.ModePerm); err != nil {
+			c.log.Error("Error creating directory: ", err)
+			return "", fmt.Errorf("error creating directory: %v", err)
+		}
+	}
+
+	fileHeader, err := ctx.FormFile(formKey)
+	if err != nil {
+		return "", fmt.Errorf("file not found: %s", formKey)
+	}
+
+	src, err := fileHeader.Open()
+	if err != nil {
+		c.log.Error("Error opening file: ", err)
+		return "", fmt.Errorf("error opening file")
+	}
+	defer src.Close()
+
+	allowedExtensions := map[string]bool{
+		".pdf":  true,
+		".doc":  true,
+		".docx": true,
+		".txt":  true,
+		".png":  true,
+		".jpg":  true,
+		".jpeg": true,
+	}
+
+	ext := filepath.Ext(fileHeader.Filename)
+	if !allowedExtensions[ext] {
+		return "", fmt.Errorf("file type '%s' is not allowed", ext)
+	}
+
+	filename := fmt.Sprintf("%s%s", c.generateAssignmentFilename(), ext)
+	filePath := filepath.Join(pathToPdf, filename)
+	fileUrl := fmt.Sprintf("http://localhost%s/api/file/%s", c.cfg.Http.Port, filename)
+
+	dst, err := os.Create(filePath)
+	if err != nil {
+		c.log.Error("Error saving file: ", err)
+		return "", fmt.Errorf("error saving file")
+	}
+	defer dst.Close()
+
+	if _, err = io.Copy(dst, src); err != nil {
+		c.log.Error("Error copying file: ", err)
+		return "", fmt.Errorf("error copying file")
+	}
+
+	return fileUrl, nil
 }

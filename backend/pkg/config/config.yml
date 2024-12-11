@@ -17,6 +17,7 @@ mongoCollections:
   refreshTokens: refreshTokens
   s3: s3
   courses: courses
+  submissions: submissions
 
 accessTokenExp: 3600s
 refreshTokenExp: 86400s

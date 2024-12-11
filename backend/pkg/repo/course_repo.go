@@ -66,9 +66,18 @@ func (c *CourseMongoRepo) GetById(ctx context.Context, courseId string) (*model.
 }
 
 func (c *CourseMongoRepo) SubmitAssignment(ctx context.Context, submission *model.Submission) error {
+	_, err := c.getSubmissionCollection().InsertOne(ctx, submission, &options.InsertOneOptions{})
+	if err != nil && !strings.Contains(err.Error(), "no documents") {
+		c.log.Debugf("(CourseMOongoRepo) error: %v", err)
+		return err
+	}
 	return nil
 }
 
 func (c *CourseMongoRepo) getCourseCollection() *mongo.Collection {
 	return c.mongoClient.Database(c.cfg.Mongo.Db).Collection(c.cfg.MongoCollections.Courses)
+}
+
+func (c *CourseMongoRepo) getSubmissionCollection() *mongo.Collection {
+	return c.mongoClient.Database(c.cfg.Mongo.Db).Collection(c.cfg.MongoCollections.Submissions)
 }

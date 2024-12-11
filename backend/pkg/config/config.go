@@ -27,6 +27,7 @@ type MongoCollections struct {
 	RefreshTokens string `mapstructure:"refreshTokens" validate:"required"`
 	S3            string `mapstructure:"s3" validate:"required"`
 	Courses       string `mapstructure:"courses" validate:"required"`
+	Submissions   string `mapstructure:"submissions" validate:"required"`
 }
 
 type Http struct {
