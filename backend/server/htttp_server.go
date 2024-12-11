@@ -18,6 +18,7 @@ func (s *server) runHttpServer() error {
 func (s *server) mapRoutes() {
 	signOut := s.echo.Group("api/auth/sign-out", s.middleware.AuthMiddleware)
 	updateUser := s.echo.Group("api/auth/update-user", s.middleware.AuthMiddleware)
+	s.echo.POST("api/auth/rotate", s.authController.RefreshTokens, s.middleware.AuthMiddleware)
 
 	updateUser.POST("", s.authController.UpdateUser)
 	s.echo.POST("api/auth/sign-up", s.authController.SignUp)
