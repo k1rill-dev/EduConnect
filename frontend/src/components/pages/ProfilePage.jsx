@@ -1,10 +1,10 @@
-import React from 'react';
-import { Card, Badge, Button } from 'flowbite-react';
+import React, { useState } from 'react';
+import { Card, Badge, Button, Modal, TextInput, Textarea } from 'flowbite-react';
 import { useNavigate } from "react-router-dom";
 
 const userProfile = {
   name: 'Иван Иванов',
-  role: 'company',
+  role: 'student',
   courses: [
     { id: 1, title: 'Основы веб-разработки', description: 'HTML, CSS, JavaScript' },
     { id: 2, title: 'Реактивное программирование', description: 'React.js, Redux' },
@@ -17,10 +17,45 @@ const userProfile = {
     { id: 1, title: 'Основы Python', description: 'Основы языка программирования Python' },
     { id: 2, title: 'Машинное обучение', description: 'Введение в машинное обучение' },
   ],
+  portfolio: {
+    id: 'student123',
+    items: [
+      { description: 'Проект по созданию сайта', title: 'Сайт-портфолио', url: 'https://myportfolio.com' }
+    ]
+  }
 };
 
 const ProfilePage = () => {
   const nav = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [portfolioItem, setPortfolioItem] = useState({ title: '', description: '', url: '' });
+  const [isEditing, setIsEditing] = useState(false);
+  const [portfolio, setPortfolio] = useState(userProfile.portfolio.items);
+
+  const handlePortfolioChange = (e) => {
+    const { name, value } = e.target;
+    setPortfolioItem({ ...portfolioItem, [name]: value });
+  };
+
+  const handleSavePortfolio = () => {
+    if (isEditing) {
+      const updatedPortfolio = portfolio.map(item =>
+        item.title === portfolioItem.title ? portfolioItem : item
+      );
+      setPortfolio(updatedPortfolio);
+    } else {
+      setPortfolio([...portfolio, portfolioItem]);
+    }
+    setIsModalOpen(false);
+    setPortfolioItem({ title: '', description: '', url: '' });
+    setIsEditing(false);
+  };
+
+  const handleEditPortfolioItem = (item) => {
+    setPortfolioItem(item);
+    setIsEditing(true);
+    setIsModalOpen(true);
+  };
 
   const renderContent = () => {
     switch (userProfile.role) {
@@ -36,6 +71,23 @@ const ProfilePage = () => {
                 </Card>
               ))}
             </div>
+
+            <h2 className="text-2xl font-semibold mb-4 mt-8">Моё портфолио</h2>
+            <div className="space-y-4">
+              {portfolio.length > 0 ? (
+                portfolio.map((item, index) => (
+                  <Card key={index} className="hover:shadow-lg">
+                    <h3 className="text-xl font-medium text-gray-800">{item.title}</h3>
+                    <p className="text-gray-600">{item.description}</p>
+                    <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-indigo-600">Перейти к проекту</a>
+                    <Button onClick={() => handleEditPortfolioItem(item)} className="mt-2 bg-indigo-600 hover:bg-indigo-700">Редактировать</Button>
+                  </Card>
+                ))
+              ) : (
+                <p>Нет элементов в портфолио.</p>
+              )}
+            </div>
+            <Button onClick={() => setIsModalOpen(true)} className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white shadow-md">Добавить проект</Button>
           </div>
         );
       case 'company':
@@ -116,6 +168,37 @@ const ProfilePage = () => {
           {renderContent()}
         </div>
       </div>
+
+      {/* Модальное окно для добавления/редактирования портфолио */}
+      <Modal show={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <Modal.Header>{isEditing ? 'Редактировать проект' : 'Добавить проект'}</Modal.Header>
+        <Modal.Body>
+          <div className="space-y-4">
+            <TextInput
+              label="Название проекта"
+              name="title"
+              value={portfolioItem.title}
+              onChange={handlePortfolioChange}
+            />
+            <Textarea
+              label="Описание"
+              name="description"
+              value={portfolioItem.description}
+              onChange={handlePortfolioChange}
+            />
+            <TextInput
+              label="Ссылка на проект"
+              name="url"
+              value={portfolioItem.url}
+              onChange={handlePortfolioChange}
+            />
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={handleSavePortfolio}>{isEditing ? 'Сохранить' : 'Добавить'}</Button>
+          <Button onClick={() => setIsModalOpen(false)} className="bg-gray-500 hover:bg-gray-600">Отмена</Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
