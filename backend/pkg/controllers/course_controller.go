@@ -191,6 +191,7 @@ func (c *CourseController) SubmitAssignment(ctx echo.Context) error {
 	topic := ctx.FormValue("topic")
 	assignment := ctx.FormValue("assignment")
 	courseId := ctx.FormValue("course_id")
+	teacherId := ctx.FormValue("teacher_id")
 
 	filePath, err := c.saveFile(ctx, "submission")
 	if err != nil {
@@ -205,6 +206,7 @@ func (c *CourseController) SubmitAssignment(ctx echo.Context) error {
 		Assignment: assignment,
 		Submission: filePath,
 		CourseId:   courseId,
+		TeacherId:  teacherId,
 	}
 
 	submissionUuid, _ := uuid.NewV7()
@@ -217,6 +219,7 @@ func (c *CourseController) SubmitAssignment(ctx echo.Context) error {
 		SubmittedAt: time.Now(),
 		CourseId:    req.CourseId,
 		StudentId:   accountId,
+		TeacherId:   req.TeacherId,
 	}
 
 	if err := c.courseRepo.SubmitAssignment(context.Background(), submission); err != nil {
@@ -227,6 +230,69 @@ func (c *CourseController) SubmitAssignment(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, map[string]string{})
+}
+
+func (c *CourseController) GetSubmissionsByTeacherId(ctx echo.Context) error {
+	var req requests.GetSubmissionsByTeacherIdRequest
+	if err := c.decodeRequest(ctx, &req); err != nil {
+		c.log.Debugf("Failed to decode request GetCourseById: %v", err)
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Validation error: %v", err)})
+	}
+
+	submissions, err := c.courseRepo.GetSubmissionsByTeacherId(context.Background(), req.TeacherId)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, map[string]string{
+			"error": "Error by get submissions",
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"submissions": submissions,
+	})
+}
+
+func (c *CourseController) GetSubmissionById(ctx echo.Context) error {
+	var req requests.GetSubmissionById
+	if err := c.decodeRequest(ctx, &req); err != nil {
+		c.log.Debugf("Failed to decode request GetCourseById: %v", err)
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Validation error: %v", err)})
+	}
+
+	submission, err := c.courseRepo.GetById(context.Background(), req.Id)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, map[string]string{
+			"error": err.Error(),
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"submission": submission,
+	})
+}
+
+func (c *CourseController) GetByStudentId(ctx echo.Context) error {
+	accountClaims := (ctx.Get("claims")).(jwt.MapClaims)
+	accountId := accountClaims["sub"].(string)
+
+	// account, err := c.userRepo.GetById(context.Background(), accountId)
+	// if err != nil {
+	// 	return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Validation error: %v", err)})
+	// }
+
+	if user, _ := c.userRepo.GetById(context.Background(), accountId); user == nil {
+		return ctx.JSON(http.StatusUnauthorized, map[string]string{"error": "User doesnt exist"})
+	}
+
+	submissions, err := c.courseRepo.GetSubmissionsByStudentId(context.Background(), accountId)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{
+			"error": err.Error(),
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"submissions": submissions,
+	})
 }
 
 func (c *CourseController) savePdfFile(ctx echo.Context, theoryFile string) (string, error) {
@@ -277,6 +343,81 @@ func (a *CourseController) decodeRequest(ctx echo.Context, i interface{}) error 
 	}
 
 	return nil
+}
+
+func (c *CourseController) EnrollCourse(ctx echo.Context) error {
+	accountClaims := (ctx.Get("claims")).(jwt.MapClaims)
+	accountId := accountClaims["sub"].(string)
+
+	account, err := c.userRepo.GetById(context.Background(), accountId)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Validation error: %v", err)})
+	}
+
+	if account.Role != "student" {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "role is not student"})
+	}
+
+	var req requests.EnrollStudentRequest
+	if err := c.decodeRequest(ctx, &req); err != nil {
+		c.log.Debugf("Failed to decode request GetCourseById: %v", err)
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Validation error: %v", err)})
+	}
+
+	enrollmentCourseUuid, _ := uuid.NewV7()
+	enrollmentId := enrollmentCourseUuid.String()
+	enrollment := &model.CourseEnrollment{
+		Id:         enrollmentId,
+		StudentId:  accountId,
+		CourseId:   req.CourseId,
+		EnrolledAt: time.Now(),
+	}
+
+	if err := c.courseRepo.EnrollCourse(context.Background(), enrollment); err != nil {
+		c.log.Error("Failed to save enrollment: ", err)
+		return ctx.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Failed to save enrollent",
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, nil)
+}
+
+func (c *CourseController) EvaluateStudent(ctx echo.Context) error {
+	accountClaims := (ctx.Get("claims")).(jwt.MapClaims)
+	accountId := accountClaims["sub"].(string)
+
+	account, err := c.userRepo.GetById(context.Background(), accountId)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Validation error: %v", err)})
+	}
+
+	if account.Role != "teacher" {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "role is not teacher"})
+	}
+
+	var req requests.EvaluateStudentRequest
+	if err := c.decodeRequest(ctx, &req); err != nil {
+		c.log.Debugf("Failed to decode request GetCourseById: %v", err)
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Validation error: %v", err)})
+	}
+
+	submission, err := c.courseRepo.GetSubmissionById(context.Background(), req.SubmissionId)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, map[string]string{
+			"error": err.Error(),
+		})
+	}
+
+	submission.Grade = req.Grade
+
+	if err := c.courseRepo.UpdateSubmission(context.Background(), submission); err != nil {
+		return ctx.JSON(http.StatusInternalServerError, map[string]string{
+			"error": "Failed to update submission",
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, nil)
 }
 
 func (c *CourseController) saveFile(ctx echo.Context, formKey string) (string, error) {
