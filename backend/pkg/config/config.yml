@@ -5,10 +5,10 @@ http:
   port: :8082
 
 redis: 
-  uri: "redis:6379"
+  uri: "localhost:6379"
 
 mongo:
-  uri: "mongodb://user:password@mongodb:27017"
+  uri: "mongodb://user:password@localhost:27017"
   db: eduConnect
   connectTimeout: 10s
 
@@ -16,6 +16,7 @@ mongoCollections:
   users: users
   refreshTokens: refreshTokens
   s3: s3
+  courses: courses
 
 accessTokenExp: 3600s
 refreshTokenExp: 86400s

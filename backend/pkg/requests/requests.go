@@ -1,6 +1,9 @@
 package requests
 
-import "EduConnect/internal/model"
+import (
+	"EduConnect/internal/model"
+	"time"
+)
 
 type SignUpRequest struct {
 	Email     string `json:"email" validate:"required,email"`
@@ -19,6 +22,29 @@ type SignInRequest struct {
 
 type RefreshTokensRequest struct {
 	RefreshToken string `json:"refresh_token" validate:"required"`
+}
+
+type SignOutRequest struct {
+}
+
+type CreateCourseRequest struct {
+	Title       string         `json:"title" form:"title" validate:"required"`
+	Description string         `json:"description" form:"description" validate:"required"`
+	TeacherId   string         `json:"teacher_id" form:"teacher_id" validate:"required"`
+	StartDate   time.Time      `json:"start_date" form:"start_date" validate:"required"`
+	EndDate     time.Time      `json:"end_date" form:"end_date" validate:"required"`
+	Topics      []TopicRequest `json:"topics" form:"topics"`
+}
+
+type TopicRequest struct {
+	Title       string              `json:"title" form:"title" validate:"required"`
+	Assignments []AssignmentRequest `json:"assignments" form:"assignments"`
+}
+
+type AssignmentRequest struct {
+	Title          string `json:"title" form:"title" validate:"required"`
+	TheoryFile     string `json:"theory_file" form:"theory_file" validate:"required"`
+	AdditionalInfo string `json:"additional_info" form:"additional_info" validate:"required"`
 }
 
 type UpdateRequest struct {
@@ -50,7 +76,4 @@ type CreateJobApplication struct {
 type CreatePortfolioRequest struct {
 	StudentId string                 `bson:"student_id"`
 	Items     []model.PortfolioItems `bson:"items"`
-}
-
-type SignOutRequest struct {
 }

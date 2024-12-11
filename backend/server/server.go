@@ -29,9 +29,10 @@ type server struct {
 	jobController            *controllers.JobController
 	jobApplicationController *controllers.ApplicationController
 	portfolioController      *controllers.PortfolioController
+	courseController         *controllers.CourseController
 	mongoClient              *mongo.Client
 	middleware               *middlewares.MiddlewareManager
-  s3             *s3.S3Storage
+	s3                       *s3.S3Storage
 }
 
 func NewServer(log logger.Logger, cfg *config.Config) *server {
@@ -60,24 +61,26 @@ func (s *server) Run() error {
 		return err
 	}
 
-	userRepo := repo.NewMongoAccountRepo(s.log, s.cfg, s.mongoClient)
-	jobRepo := repo.NewJobRepo(s.log, s.cfg, s.mongoClient)
-	jobApplicationRepo := repo.NewJobApplicationRepo(s.log, s.cfg, s.mongoClient)
-	jwtRepo := repo.NewJwtRepo(s.log, s.cfg, redisClient, mongo)
-	portfolioRepo := repo.NewPortfolioRepositoryMongo(s.log, s.cfg, s.mongoClient)
-	jwtManager := jwt.NewJwtManager(s.log, s.cfg, jwtRepo)
-	validate := s.setupValidator()
-	s.middleware = middlewares.NewMiddlewareManager(s.log, s.cfg, jwtManager)
-	s.authController = controllers.NewAuthController(s.log, s.cfg, userRepo, validate, jwtManager)
-	s.jobController = controllers.NewJobController(s.log, s.cfg, jobRepo, validate, jwtManager, userRepo)
-	s.jobApplicationController = controllers.NewApplicationController(s.log, s.cfg, jobApplicationRepo, validate, jwtManager, userRepo)
-	s.portfolioController = controllers.NewPortfolioController(s.log, s.cfg, portfolioRepo, validate, jwtManager, userRepo)
-
 	s3Storage, err := s3.NewS3Storage(s.log, s.cfg, s.mongoClient)
 	if err != nil {
 		s.log.Fatalf("S3Storage failed to start: %v", err)
 	}
 	s.s3 = s3Storage
+	userRepo := repo.NewMongoAccountRepo(s.log, s.cfg, s.mongoClient)
+	jobRepo := repo.NewJobRepo(s.log, s.cfg, s.mongoClient)
+	jobApplicationRepo := repo.NewJobApplicationRepo(s.log, s.cfg, s.mongoClient)
+	portfolioRepo := repo.NewPortfolioRepositoryMongo(s.log, s.cfg, s.mongoClient)
+	jwtRepo := repo.NewJwtRepo(s.log, s.cfg, redisClient, mongo)
+	jwtManager := jwt.NewJwtManager(s.log, s.cfg, jwtRepo)
+	validate := s.setupValidator()
+	s.middleware = middlewares.NewMiddlewareManager(s.log, s.cfg, jwtManager)
+	s.authController = controllers.NewAuthController(s.log, s.cfg, userRepo, validate, jwtManager, s3Storage)
+	s.jobController = controllers.NewJobController(s.log, s.cfg, jobRepo, validate, jwtManager, userRepo)
+	s.jobApplicationController = controllers.NewApplicationController(s.log, s.cfg, jobApplicationRepo, validate, jwtManager, userRepo)
+	s.portfolioController = controllers.NewPortfolioController(s.log, s.cfg, portfolioRepo, validate, jwtManager, userRepo)
+	courseRepository := repo.NewCourseMongoRepo(s.log, s.cfg, s.mongoClient)
+	courseController := controllers.NewCourseController(s.log, s.cfg, validate, courseRepository)
+	s.courseController = courseController
 
 	go func() {
 		if err := s.runHttpServer(); err != nil {

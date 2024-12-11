@@ -4,8 +4,8 @@ import (
 	"EduConnect/pkg/config"
 	"EduConnect/pkg/logger"
 	"context"
+	"encoding/base64"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -16,7 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-const storagePath = "./storage"
+const storagePath = "./storage/photo"
 
 type S3Storage struct {
 	cfg         *config.Config
@@ -47,46 +47,36 @@ func (s *S3Storage) generateFileName() string {
 	return uuid.String()
 }
 
-func (s *S3Storage) UploadFile(c echo.Context) error {
-	file, err := c.FormFile("file")
+func (s *S3Storage) UploadFile(base64Photo string) (string, error) {
+	fileData, err := base64.StdEncoding.DecodeString(base64Photo)
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Не удалось получить файл")
+		return "", fmt.Errorf("ошибка декодирования Base64: %w", err)
 	}
-	src, err := file.Open()
+
+	fileId := s.generateFileName()
+	fileName := fmt.Sprintf("%s.jpg", fileId)
+	filePath := filepath.Join(storagePath, fileName)
+
+	err = os.WriteFile(filePath, fileData, os.ModePerm)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Не удалось открыть файл")
-	}
-	defer src.Close()
-
-	fileID := fmt.Sprintf("%s.jpg", s.generateFileName())
-	filePath := filepath.Join(storagePath, fileID)
-
-	dst, err := os.Create(filePath)
-	if err != nil {
-		return c.String(http.StatusInternalServerError, "Не удалось создать файл на сервере")
-	}
-	defer dst.Close()
-
-	if _, err = io.Copy(dst, src); err != nil {
-		return c.String(http.StatusInternalServerError, "Ошибка при копировании файла")
+		return "", fmt.Errorf("ошибка сохранения файла: %w", err)
 	}
 
-	downloadURL := fmt.Sprintf("http://localhost:8083/files/%s", fileID)
-
-	defer s.mongoClient.Disconnect(context.TODO())
+	downloadURL := fmt.Sprintf("http://localhost%s/api/files/%s", s.cfg.Http.Port, fileName)
 
 	fileInfo := FileInfo{
-		ID:        fileID,
-		FileName:  file.Filename,
+		ID:        fileId,
+		FileName:  fileName,
 		UploadURL: downloadURL,
 	}
 
 	_, err = s.getS3Collection().InsertOne(context.TODO(), fileInfo)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Не удалось сохранить информацию о файле в базу данных")
+		return "", fmt.Errorf("Failed to save file info in db")
+		// return c.String(http.StatusInternalServerError, "Не удалось сохранить информацию о файле в базу данных")
 	}
 
-	return c.String(http.StatusOK, downloadURL)
+	return downloadURL, nil
 }
 
 func (s *S3Storage) GetFileLink(c echo.Context) error {

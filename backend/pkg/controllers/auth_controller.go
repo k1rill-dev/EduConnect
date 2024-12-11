@@ -9,6 +9,7 @@ import (
 	"EduConnect/pkg/logger"
 	"EduConnect/pkg/requests"
 	"EduConnect/pkg/response"
+	"EduConnect/pkg/s3"
 	"context"
 	"fmt"
 	"net/http"
@@ -26,10 +27,11 @@ type AuthController struct {
 	validate       *validator.Validate
 	jwtManager     jwt.JwtManager
 	userRepository repository.UserRepository
+	s3Store        *s3.S3Storage
 }
 
-func NewAuthController(log logger.Logger, cfg *config.Config, userRepository repository.UserRepository, validator *validator.Validate, jwtManager jwt.JwtManager) *AuthController {
-	return &AuthController{log: log, cfg: cfg, userRepository: userRepository, validate: validator, jwtManager: jwtManager}
+func NewAuthController(log logger.Logger, cfg *config.Config, userRepository repository.UserRepository, validator *validator.Validate, jwtManager jwt.JwtManager, s3Store *s3.S3Storage) *AuthController {
+	return &AuthController{log: log, cfg: cfg, userRepository: userRepository, validate: validator, jwtManager: jwtManager, s3Store: s3Store}
 }
 
 // SignUp godoc
@@ -63,10 +65,19 @@ func (a *AuthController) SignUp(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Password error: %v", err)})
 	}
 
-	//TODO: Добавить сохранение фотки и ниже уже ссылку пихать
+	picture := ""
+	if req.Picture != "" {
+		pictureUrl, err := a.s3Store.UploadFile(req.Picture)
+		if err != nil {
+			a.log.Debugf("Failed to save photo: %v", err)
+			return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Fail to save photo: %v", err)})
+		}
+		picture = pictureUrl
+	}
+
 	userUuid, _ := uuid.NewV7()
 	userId := userUuid.String()
-	user := model.NewUser(userId, email, hashedPassword, req.Picture, req.Bio, time.Now(), req.Role, req.FirstName, req.Surname)
+	user := model.NewUser(userId, email, hashedPassword, picture, req.Bio, time.Now(), req.Role, req.FirstName, req.Surname)
 
 	deviceUuid, _ := uuid.NewV7()
 	deviceId := deviceUuid.String()
