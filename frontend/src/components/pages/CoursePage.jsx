@@ -106,6 +106,12 @@ const CoursePage = () => {
               >
                 Перейти на курс
               </Button>
+               <Button
+                href={`/courseTeacher/${course.course_id}/`}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3"
+              >
+                Перейти на курс(преподавателю)
+              </Button>
             </div>
           </div>
         </div>
