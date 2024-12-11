@@ -22,13 +22,14 @@ import (
 )
 
 type server struct {
-	log            logger.Logger
-	cfg            *config.Config
-	echo           *echo.Echo
-	authController *controllers.AuthController
-	mongoClient    *mongo.Client
-	middleware     *middlewares.MiddlewareManager
-	s3             *s3.S3Storage
+	log              logger.Logger
+	cfg              *config.Config
+	echo             *echo.Echo
+	authController   *controllers.AuthController
+	courseController *controllers.CourseController
+	mongoClient      *mongo.Client
+	middleware       *middlewares.MiddlewareManager
+	s3               *s3.S3Storage
 }
 
 func NewServer(log logger.Logger, cfg *config.Config) *server {
@@ -68,6 +69,9 @@ func (s *server) Run() error {
 	validate := s.setupValidator()
 	s.middleware = middlewares.NewMiddlewareManager(s.log, s.cfg, jwtManager)
 	s.authController = controllers.NewAuthController(s.log, s.cfg, userRepo, validate, jwtManager, s3Storage)
+	courseRepository := repo.NewCourseMongoRepo(s.log, s.cfg, s.mongoClient)
+	courseController := controllers.NewCourseController(s.log, s.cfg, validate, courseRepository)
+	s.courseController = courseController
 
 	go func() {
 		if err := s.runHttpServer(); err != nil {

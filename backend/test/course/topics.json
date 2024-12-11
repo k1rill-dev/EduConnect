@@ -1,0 +1,13 @@
+[
+    {
+      "title": "Advanced Topics",
+      "assignments": [
+        {
+          "title": "Concurrency",
+          "theory_file": "assignment3",
+          "additional_info": "Goroutines and Channels"
+        }
+      ]
+    }
+]
+  

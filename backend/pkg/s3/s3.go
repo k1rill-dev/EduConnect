@@ -16,7 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-const storagePath = "./storage"
+const storagePath = "./storage/photo"
 
 type S3Storage struct {
 	cfg         *config.Config

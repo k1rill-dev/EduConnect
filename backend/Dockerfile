@@ -16,6 +16,6 @@ COPY --from=builder /app/main .
 COPY --from=builder /app/pkg/config ./pkg/config
 COPY --from=builder /app .env
 
-EXPOSE 8080
+EXPOSE 8082
 
 CMD ["./main"]

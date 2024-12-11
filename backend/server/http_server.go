@@ -19,6 +19,8 @@ func (s *server) mapRoutes() {
 	s.echo.POST("api/auth/sign-in", s.authController.SignIn)
 	s.echo.POST("api/auth/sign-out", s.authController.SignOut)
 
+	s.echo.POST("api/course/", s.courseController.CreateCourse)
+
 	s.echo.Static("api/files/", "storage")
 
 	s.echo.GET("/swagger/*", echoSwagger.WrapHandler)
