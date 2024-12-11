@@ -170,12 +170,11 @@ func (c *CourseController) GetCourseById(ctx echo.Context) error {
 }
 
 func (c *CourseController) SubmitAssignment(ctx echo.Context) error {
-	var req requests.SubmitAssignmentRequest
-	if err := c.decodeRequest(ctx, &req); err != nil {
-		c.log.Debugf("Failed to decode request GetCourseById: %v", err)
-		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Validation error: %v", err)})
-	}
-
+	// var req requests.SubmitAssignmentRequest
+	// if err := c.decodeRequest(ctx, &req); err != nil {
+	// 	c.log.Debugf("Failed to decode request GetCourseById: %v", err)
+	// 	return ctx.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("Validation error: %v", err)})
+	// }
 	accountClaims := (ctx.Get("claims")).(jwt.MapClaims)
 	accountId := accountClaims["sub"].(string)
 
@@ -186,6 +185,22 @@ func (c *CourseController) SubmitAssignment(ctx echo.Context) error {
 
 	if account.Role != "student" {
 		return ctx.JSON(http.StatusNetworkAuthenticationRequired, "Role is not student")
+	}
+
+	topic := ctx.FormValue("topic")
+	courseId := ctx.FormValue("course_id")
+
+	filePath, err := c.savePdfFile(ctx, ctx.FormValue("assignment"))
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Error by save pdf",
+		})
+	}
+
+	req := requests.SubmitAssignmentRequest{
+		Topic:      topic,
+		Assignment: filePath,
+		CourseId:   courseId,
 	}
 
 	submissionUuid, _ := uuid.NewV7()

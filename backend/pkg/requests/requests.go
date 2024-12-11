@@ -83,9 +83,10 @@ type CreatePortfolioRequest struct {
 }
 
 type SubmitAssignmentRequest struct {
-	Topic      string `json:"topic" validate:"required"`
-	Assignment string `bson:"assignment" validate:"required"`
-	CourseId   string `bson:"course_id" validate:"required"`
+	Topic      string `json:"topic" form:"topic" validate:"required"`
+	Assignment string `bson:"assignment" form:"assignment" validate:"required"`
+	CourseId   string `bson:"course_id" form:"course_id" validate:"required"`
+	// TheoryFile string `json:"theory_file" form:"theory_file" validate:"required"`
 	// Grade      string `bson:"grade" validate:"required"`
 	// SubmittedAt time.Time `bson:"submission_at"`
 	// StudentId   string    `bson:"student_id" `
